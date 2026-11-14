@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سنتر الذيب</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --wine: #4a1118;
+            --gold: #c9a45c;
+            --gold-light: #ead8ad;
+            --white: #ffffff;
+            --card-bg: #ffffff;
+            --text-dark: #292321;
+            --text-muted: #777;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body { 
+            background-color: var(--wine); font-family: 'Cairo', sans-serif; color: var(--white);
+            min-height: 100vh; display: flex; flex-direction: column; align-items: center; text-align: center;
+            padding: 40px 20px; overflow-x: hidden; position: relative;
+        }
+
+        /* شريط حالة الزبون (فوق عاليسار) */
+        .user-status-bar {
+            position: absolute; top: 20px; left: 20px;
+            background-color: rgba(255, 255, 255, 0.1); border: 1px solid var(--gold);
+            padding: 8px 15px; border-radius: 30px; display: none; align-items: center; gap: 8px;
+            color: var(--white); font-weight: bold; font-size: 14px; z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        .user-status-bar a { color: var(--gold); text-decoration: none; font-size: 12px; margin-right: 5px; }
+        .header-badge { width: 18px; height: 18px; display: inline-flex; justify-content: center; align-items: center; }
+        .header-badge svg { width: 100%; height: 100%; fill: #28a745; }
+
+        /* زر سعر الصرف (دائري صغير وأنيق، فوق عاليمين) */
+        .exchange-rate-btn {
+            position: absolute; 
+            top: 20px; 
+            right: 20px;
+            background-color: var(--gold); 
+            border: 2px solid var(--gold-light);
+            border-radius: 50%; 
+            width: 45px; 
+            height: 45px;
+            cursor: pointer;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
+            transition: 0.3s;
+        }
+        .exchange-rate-btn:hover { 
+            background-color: var(--gold-light); 
+            transform: translateY(-3px) scale(1.05); 
+        }
+        
+        /* صورة الملصق (آيفون) */
+        .exchange-rate-btn img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+
+        /* قسم اللوغو والأزرار */
+        .hero-section {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 80vh; width: 100%;
+            padding-top: 60px; /* عشان يبعد عن الأزرار اللي فوق */
+        }
+
+        @keyframes wolfEntrance {
+            0% { transform: scale(0.5) rotate(-15deg); opacity: 0; filter: blur(8px); }
+            60% { transform: scale(1.05) rotate(5deg); opacity: 1; filter: blur(0); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .logo img { 
+            width: 180px; height: auto; object-fit: contain; margin-bottom: 20px;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+            animation: wolfEntrance 2s ease-out forwards; 
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .brand { animation: fadeInUp 1s ease-out 1.5s forwards; opacity: 0; }
+        .actions { animation: fadeInUp 1s ease-out 2s forwards; opacity: 0; }
+
+        .brand h1 { font-size: 48px; font-weight: 900; color: var(--gold); text-shadow: 2px 2px 5px rgba(0,0,0,0.5); margin-bottom: 10px; }
+        .brand p { font-size: 16px; color: var(--gold-light); letter-spacing: 3px; font-weight: 600; margin-bottom: 40px; }
+
+        .actions { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; max-width: 500px; }
+
+        .btn {
+            background-color: transparent; color: var(--gold); border: 2px solid var(--gold);
+            padding: 12px 25px; border-radius: 50px; cursor: pointer; font-family: 'Cairo', sans-serif;
+            font-weight: 700; font-size: 16px; transition: all 0.3s ease; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn:hover { background-color: var(--gold); color: var(--wine); transform: translateY(-3px); }
+        .btn-primary { background-color: var(--gold); color: var(--wine); }
+        .btn-primary:hover { background-color: var(--gold-light); }
+        .btn-admin { border-color: #89817b; color: #89817b; font-size: 14px; padding: 10px 20px;}
+        .btn-admin:hover { background-color: #89817b; color: white;}
+
+        /* قسم التغريدات */
+        .tweets-section {
+            width: 100%; max-width: 520px; margin-top: 40px;
+            display: flex; flex-direction: column; gap: 12px; opacity: 0; 
+        }
+
+        @keyframes slideFromRight {
+            0% { opacity: 0; transform: translateX(100px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+
+        .tweet-card {
+            background-color: var(--card-bg); color: var(--text-dark); 
+            border-radius: 12px; padding: 15px; text-align: right; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 1px solid #e1e8ed; 
+            animation: slideFromRight 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            display: flex; flex-direction: column; gap: 8px; transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .tweet-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
+
+        .tweet-card.admin-tweet { background: linear-gradient(135deg, #ffffff 0%, #faf8f3 100%); border: 2px solid var(--gold); box-shadow: 0 5px 15px rgba(201, 164, 92, 0.2); }
+
+        .admin-badge { background-color: var(--wine); color: var(--gold); font-size: 10px; padding: 2px 8px; border-radius: 12px; font-weight: bold; margin-right: 5px; border: 1px solid var(--gold); }
+
+        .apple-emoji { width: 20px; height: 20px; vertical-align: middle; margin: 0 2px; }
+
+        .tweet-header { display: flex; align-items: center; gap: 10px; }
+        .tweet-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: contain; background-color: var(--wine); padding: 2px; border: 2px solid var(--gold); }
+        .tweet-user-info { display: flex; flex-direction: column; align-items: flex-start; }
+        .tweet-name-row { display: flex; align-items: center; gap: 4px; font-weight: bold; color: var(--wine); font-size: 15px; flex-wrap: wrap; }
+        .twitter-badge { width: 16px; height: 16px; fill: #1DA1F2; }
+        .tweet-role { font-size: 11px; color: var(--text-muted); }
+        .tweet-body { font-size: 15px; color: var(--text-dark); line-height: 1.6; white-space: pre-wrap; word-break: break-word; padding-top: 5px; }
+        .tweet-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f0f0f0; padding-top: 8px; margin-top: 5px; }
+        .tweet-date { font-size: 11px; color: var(--text-muted); }
+        
+        .like-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; font-family: 'Cairo', sans-serif; font-size: 13px; color: #999; transition: 0.2s; }
+        .like-btn:hover { color: #e0245e; }
+        .like-btn.liked { color: #e0245e; font-weight: bold; }
+        .like-btn svg { width: 18px; height: 18px; fill: currentColor; }
+    </style>
+</head>
+<body>
+
+    <!-- زر سعر الصرف (دائري صغير) -->
+    <div class="exchange-rate-btn" onclick="showExchangeRate()" title="سعر صرف الدولار اليوم">
+        <img src="https://em-content.zobj.net/source/apple/391/dollar-banknote_1f4b5.png" alt="دولار">
+    </div>
+
+    <!-- شريط حالة الزبون (فوق عاليسار) -->
+    <div class="user-status-bar" id="userStatusBar">
+        <span id="headerUserName"></span>
+        <span class="header-badge" id="headerBadge"></span>
+        <a href="customer-login.html">(تبديل)</a>
+    </div>
+
+    <div class="hero-section">
+        <div class="logo">
+            <img src="https://i.ibb.co/S44qNbT8/1000119201.png" alt="لوغو سنتر الذيب">
+        </div>
+        
+        <div class="brand">
+            <h1>سنتر الذيب</h1>
+            <p>AL-DHEEB CENTER</p>
+        </div>
+        
+        <div class="actions">
+            <a href="customer-login.html" class="btn">حسابي (زبون)</a>
+            <a href="login.html" class="btn btn-admin">دخول الإدارة</a>
+            <a href="products.html" class="btn btn-primary">استكشف المنتجات 🛒</a>
+        </div>
+    </div>
+
+    <div class="tweets-section" id="tweetsContainer"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, orderBy, limit, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlT3aXjE7Bg6a2gx4YSGH61ybW0sdQS2g",
+            authDomain: "dheeb-brothers.firebaseapp.com",
+            projectId: "dheeb-brothers",
+            storageBucket: "dheeb-brothers.firebasestorage.app",
+            messagingSenderId: "419429945832",
+            appId: "1:419429945832:web:6cf5bc22ec496db576945d",
+            measurementId: "G-GBRL9YKWKE"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const container = document.getElementById('tweetsContainer');
+
+        const customerName = localStorage.getItem('customerName');
+        const customerPhone = localStorage.getItem('customerPhone');
+        const isVerified = localStorage.getItem('isVerified');
+
+        // إعداد شريط حالة الزبون
+        const statusBar = document.getElementById('userStatusBar');
+        const headerUserName = document.getElementById('headerUserName');
+        const headerBadge = document.getElementById('headerBadge');
+
+        if (customerName) {
+            statusBar.style.display = 'flex';
+            headerUserName.innerText = customerName;
+            if (isVerified === 'true') {
+                headerBadge.innerHTML = `<svg viewBox="0 0 24 24"><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>`;
+            }
+        }
+
+        // --- دالة عرض سعر الصرف ---
+        window.showExchangeRate = async function() {
+            try {
+                const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+                const db = getFirestore();
+                const docRef = doc(db, "settings", "exchangeRate");
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    alert(`💵 سعر صرف الدولار اليوم: ${data.rate} ل.س\n📅 تاريخ التحديث: ${data.date}`);
+                } else {
+                    alert("سعر الصرف غير متوفر حالياً.");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("حدث خطأ في جلب سعر الصرف.");
+            }
+        }
+
+        // --- تحويل الإيموجي لآيفون ---
+        function replaceEmojisWithApple(text) {
+            const emojiMap = {
+                '😊': 'smiling-face-with-smiling-eyes_1f60a.png',
+                '😂': 'face-with-tears-of-joy_1f602.png',
+                '❤️': 'red-heart_2764-fe0f.png',
+                '🔥': 'fire_1f525.png',
+                '🎉': 'party-popper_1f389.png',
+                '✨': 'sparkles_2728.png',
+                '👑': 'crown_1f451.png',
+                '🚀': 'rocket_1f680.png',
+                '👍': 'thumbs-up_1f44d.png',
+                '🛒': 'shopping-cart_1f6d2.png',
+                '💯': 'hundred-points_1f4af.png',
+                '🌟': 'glowing-star_1f31f.png',
+                '🎁': 'wrapped-gift_1f381.png',
+                '💎': 'gem-stone_1f48e.png'
+            };
+            
+            let newText = text;
+            for (const [emoji, fileName] of Object.entries(emojiMap)) {
+                const imgTag = `<img src="https://em-content.zobj.net/source/apple/391/${fileName}" class="apple-emoji" alt="${emoji}">`;
+                newText = newText.split(emoji).join(imgTag);
+            }
+            return newText;
+        }
+
+        // --- تحميل التغريدات ---
+        async function loadTweets() {
+            try {
+                const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"), limit(5));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    container.style.display = 'none';
+                    return;
+                }
+
+                container.style.display = 'flex';
+                container.style.opacity = '1';
+                container.innerHTML = ''; 
+
+                querySnapshot.forEach((docSnap, index) => {
+                    const tweet = docSnap.data();
+                    const tweetId = docSnap.id;
+                    
+                    const isAdmin = tweet.author === "شهاب الحمدان" || tweet.author === "وسام ذيب" || tweet.author === "صاحب المركز";
+                    const cardClass = isAdmin ? 'tweet-card admin-tweet' : 'tweet-card';
+
+                    let dateStr = '';
+                    if (tweet.createdAt) {
+                        const date = tweet.createdAt.toDate();
+                        dateStr = date.toLocaleString('ar-EG', { hour: '2-digit', minute:'2-digit', year: 'numeric', month: 'short', day: 'numeric' });
+                    }
+
+                    const likesCount = tweet.likes ? tweet.likes.length : 0;
+                    const isLiked = customerPhone && tweet.likes ? tweet.likes.includes(customerPhone) : false;
+
+                    const formattedText = replaceEmojisWithApple(tweet.text);
+
+                    const card = document.createElement('div');
+                    card.className = cardClass;
+                    card.style.animationDelay = `${index * 0.15}s`; 
+                    
+                    card.innerHTML = `
+                        <div class="tweet-header">
+                            <img src="https://i.ibb.co/S44qNbT8/1000119201.png" alt="Profile" class="tweet-avatar">
+                            <div class="tweet-user-info">
+                                <div class="tweet-name-row">
+                                    ${tweet.author}
+                                    <svg class="twitter-badge" viewBox="0 0 24 24"><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>
+                                    ${isAdmin ? '<span class="admin-badge">👑 الإدارة</span>' : ''}
+                                </div>
+                                <span class="tweet-role">${tweet.role}</span>
+                            </div>
+                        </div>
+                        <div class="tweet-body">${formattedText}</div>
+                        <div class="tweet-footer">
+                            <span class="tweet-date">${dateStr}</span>
+                            <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike('${tweetId}', ${isLiked})">
+                                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                <span>${likesCount}</span>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error("خطأ في جلب التغريدات:", error);
+                container.style.display = 'none'; 
+            }
+        }
+
+        window.toggleLike = async function(tweetId, isCurrentlyLiked) {
+            if (!customerPhone) {
+                alert('يجب عليك تسجيل الدخول كزبون أولاً لتتمكن من التفاعل!');
+                return;
+            }
+
+            try {
+                const tweetRef = doc(db, "announcements", tweetId);
+                if (isCurrentlyLiked) {
+                    await updateDoc(tweetRef, { likes: arrayRemove(customerPhone) });
+                } else {
+                    await updateDoc(tweetRef, { likes: arrayUnion(customerPhone) });
+                }
+                loadTweets(); 
+            } catch (error) {
+                alert('حدث خطأ أثناء التفاعل: ' + error.message);
+            }
+        }
+
+        loadTweets();
+    </script>
+
+</body>
+</html>
