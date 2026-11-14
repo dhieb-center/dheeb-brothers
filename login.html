@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دخول الإدارة - ذيب إخوان</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #4a1118; font-family: 'Cairo', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-box { background-color: #fff; padding: 40px 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; width: 90%; max-width: 400px; }
+        .logo-container img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 15px; }
+        .login-box h2 { color: #4a1118; margin-top: 0; margin-bottom: 5px; }
+        .login-box p { color: #777; font-size: 14px; margin-bottom: 25px; }
+        .input-group { margin-bottom: 20px; text-align: right; }
+        .input-group label { display: block; color: #333; margin-bottom: 8px; font-weight: bold; font-size: 14px; }
+        .input-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; background-color: #f9f9f9; text-align: left; direction: ltr; }
+        .login-btn { width: 100%; padding: 12px; background-color: #c9a45c; color: #fff; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'Cairo', sans-serif; }
+        .login-btn:hover { background-color: #b08d4a; }
+        #error-msg { color: red; display: none; margin-top: 15px; font-weight: bold; font-size: 14px;}
+    </style>
+</head>
+<body>
+
+    <div class="login-box">
+        <div class="logo-container">
+            <img src="https://i.ibb.co/S44qNbT8/1000119201.png" alt="شعار ذيب إخوان">
+        </div>
+        <h2>بوابة الإدارة</h2>
+        <p>سجل دخولك للوصول إلى لوحة التحكم</p>
+
+        <form id="loginForm">
+            <div class="input-group">
+                <label>البريد الإلكتروني</label>
+                <input type="email" id="email" placeholder="admin@dheeb.com" required>
+            </div>
+            <div class="input-group">
+                <label>كلمة المرور</label>
+                <input type="password" id="password" placeholder="********" required>
+            </div>
+            <button type="submit" class="login-btn" id="submitBtn">دخول</button>
+        </form>
+        <p id="error-msg">البريد الإلكتروني أو كلمة المرور غير صحيحة!</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlT3aXjE7Bg6a2gx4YSGH61ybW0sdQS2g",
+            authDomain: "dheeb-brothers.firebaseapp.com",
+            projectId: "dheeb-brothers",
+            storageBucket: "dheeb-brothers.firebasestorage.app",
+            messagingSenderId: "419429945832",
+            appId: "1:419429945832:web:6cf5bc22ec496db576945d",
+            measurementId: "G-GBRL9YKWKE"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('error-msg');
+            const submitBtn = document.getElementById('submitBtn');
+
+            submitBtn.innerText = "جاري التحقق...";
+            submitBtn.disabled = true;
+            errorMsg.style.display = 'none';
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    if (user.email === 'admin@dheeb.com') {
+                        localStorage.setItem('role', 'admin');
+                    } else {
+                        localStorage.setItem('role', 'user'); 
+                    }
+                    window.location.href = 'dashboard.html';
+                })
+                .catch((error) => {
+                    errorMsg.style.display = 'block';
+                    submitBtn.innerText = "دخول";
+                    submitBtn.disabled = false;
+                });
+        });
+    </script>
+
+</body>
+</html>
