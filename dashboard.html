@@ -3,358 +3,418 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الفاتورة - سنتر الذيب</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <!-- مكتبة تحويل الصورة -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- مكتبة إنشاء PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    
+    <title>لوحة التحكم - سنتر الذيب</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #f4f6f9; font-family: 'Cairo', sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .invoice-box { background-color: #fff; width: 100%; max-width: 650px; padding: 30px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); border-top: 10px solid #4a1118; position: relative; }
-        .invoice-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px dashed #c9a45c; padding-bottom: 20px; margin-bottom: 25px; }
-        .invoice-logo img { width: 100px; height: auto; }
-        .invoice-info { text-align: left; }
-        .invoice-info h1 { color: #4a1118; font-size: 26px; margin: 0 0 8px 0; font-weight: 900; }
-        .invoice-info p { margin: 0; font-size: 14px; color: #555; font-weight: 600; }
-        .customer-details { background-color: #faf8f3; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-right: 5px solid #c9a45c; }
-        .customer-details p { margin: 8px 0; font-size: 16px; color: #333; }
-        .customer-details strong { color: #4a1118; font-weight: 700; }
-        .delivery-options { background-color: #fdfdfd; border: 1px solid #e0e0e0; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
-        .delivery-options h3 { color: #4a1118; font-size: 18px; margin: 0 0 15px 0; font-weight: 700;}
-        .radio-group { display: flex; gap: 25px; margin-bottom: 15px; }
-        .radio-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600; color: #333; font-size: 16px;}
-        .radio-label input { width: 18px; height: 18px; accent-color: #4a1118; }
-        .address-input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-family: 'Cairo', sans-serif; font-size: 15px; display: none; box-sizing: border-box; background-color: #fff; }
-        .notes-section { margin-bottom: 25px; background-color: #fafafa; border: 1px solid #eee; border-radius: 8px; padding: 15px; }
-        .notes-section label { display: block; color: #4a1118; font-weight: 700; font-size: 16px; margin-bottom: 10px; }
-        .notes-input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-family: 'Cairo', sans-serif; font-size: 15px; box-sizing: border-box; min-height: 80px; resize: vertical; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
-        th { background-color: #4a1118; color: #c9a45c; padding: 15px 12px; font-size: 16px; font-weight: 700; text-align: right; }
-        th:first-child { border-top-right-radius: 8px; }
-        th:last-child { border-top-left-radius: 8px; }
-        td { padding: 15px 12px; border-bottom: 1px solid #eee; font-size: 15px; color: #333; font-weight: 600; }
-        tr:nth-child(even) { background-color: #faf8f3; }
-        .item-name { font-weight: 700; color: #4a1118; }
-        .item-qty { font-weight: 700; color: #c9a45c; text-align: center; }
-        .invoice-footer { text-align: center; border-top: 2px dashed #c9a45c; padding-top: 25px; margin-top: 25px; }
-        .invoice-footer p { font-size: 14px; color: #777; margin: 8px 0; font-weight: 600;}
-        .invoice-footer .thanks { font-size: 20px; color: #4a1118; font-weight: 900; margin-bottom: 10px; }
-        .actions { display: flex; gap: 12px; margin-top: 25px; flex-wrap: wrap; width: 100%; max-width: 650px; flex-direction: column;}
-        .btn { padding: 15px; border-radius: 8px; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 16px; cursor: pointer; text-align: center; text-decoration: none; transition: 0.3s; border: none; display: inline-flex; justify-content: center; align-items: center; gap: 8px; width: 100%;}
-        .btn-edit { background-color: transparent; border: 2px solid #4a1118; color: #4a1118; }
-        .btn-edit:hover { background-color: #4a1118; color: #fff; }
-        .btn-save-pdf { background-color: #4a1118; color: #c9a45c; box-shadow: 0 4px 10px rgba(74, 17, 24, 0.3); }
-        .btn-save-pdf:hover { background-color: #6b1a24; }
-        .btn-whatsapp { background-color: #25D366; color: white; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); }
+        body { background-color: #f4f6f9; font-family: 'Cairo', sans-serif; margin: 0; padding: 20px; }
+        .header { background-color: #4a1118; color: white; padding: 15px 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #c9a45c; margin-bottom: 30px; }
+        .user-info { display: flex; align-items: center; gap: 5px; font-size: 20px; font-weight: bold; white-space: nowrap; }
+        .badge { width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; }
+        .badge svg { width: 100%; height: 100%; }
+        .badge-blue { fill: #1877F2; }
+        .badge-green { fill: #28a745; }
+        .logout-btn { background-color: transparent; color: #c9a45c; border: 1px solid #c9a45c; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: bold; transition: 0.3s; }
+        .logout-btn:hover { background-color: #c9a45c; color: #4a1118; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .tweet-section { background: white; border-radius: 10px; padding: 20px; margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-right: 4px solid #4a1118; display: none; }
+        .tweet-section h3 { color: #4a1118; margin-top: 0; margin-bottom: 15px;}
+        .tweet-input { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 8px; font-family: 'Cairo', sans-serif; font-size: 16px; resize: vertical; min-height: 80px; box-sizing: border-box; margin-bottom: 10px; }
+        .tweet-input:focus { outline: none; border-color: #c9a45c; }
+        .btn-tweet { background-color: #4a1118; color: #c9a45c; border: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; font-family: 'Cairo', sans-serif; cursor: pointer; transition: 0.3s; font-size: 16px; }
+        .btn-tweet:hover { background-color: #6b1a24; color: white; }
+        .tweet-feed { margin-top: 20px; }
+        .tweet-card { background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; padding: 15px; margin-bottom: 15px; text-align: right; }
+        .tweet-author { font-weight: bold; color: #4a1118; display: flex; align-items: center; gap: 5px; font-size: 16px;}
+        .tweet-role { font-size: 11px; color: #c9a45c; font-weight: bold; margin-bottom: 10px; display: block;}
+        .tweet-text { font-size: 15px; color: #333; line-height: 1.5; white-space: pre-wrap;}
+        .tweet-date { font-size: 11px; color: #999; margin-top: 10px; display: block; text-align: left;}
+        .section-title { color: #4a1118; border-bottom: 2px solid #c9a45c; padding-bottom: 10px; margin-bottom: 20px; }
+        .birthday-section { background-color: #fff3cd; border: 1px solid #ffeeba; border-radius: 10px; padding: 20px; margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .birthday-section h3 { color: #856404; margin-top: 0; margin-bottom: 15px; border-bottom: 1px solid #ffeeba; padding-bottom: 10px;}
+        .birthday-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed #ffeeba;}
+        .birthday-item:last-child { border-bottom: none; }
+        .btn-whatsapp { background-color: #25D366; color: white; text-decoration: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; font-size: 14px; }
         .btn-whatsapp:hover { background-color: #128C7E; }
-        .btn svg { width: 22px; height: 22px; fill: currentColor; }
-        .empty-msg { text-align: center; color: #777; padding: 40px 0; font-size: 18px; font-weight: 600;}
-        @media print {
-            body { background-color: #fff; padding: 0; }
-            .invoice-box { box-shadow: none; border: none; max-width: 100%; }
-            .actions { display: none; }
-        }
+        .customer-list { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .customer-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; }
+        .customer-item:last-child { border-bottom: none; }
+        .customer-info { display: flex; flex-direction: column; gap: 5px; width: 100%; }
+        .customer-name { font-weight: bold; color: #333; font-size: 18px; display: flex; align-items: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .customer-details { font-size: 14px; color: #777; }
+        .action-buttons { display: flex; gap: 8px; flex-shrink: 0; }
+        .btn { border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: bold; transition: 0.3s; font-size: 13px; }
+        .btn-verify { background-color: #28a745; color: white; }
+        .btn-verify:hover { background-color: #218838; }
+        .btn-unverify { background-color: #ffc107; color: #333; }
+        .btn-unverify:hover { background-color: #e0a800; }
+        .btn-delete { background-color: #dc3545; color: white; }
+        .btn-delete:hover { background-color: #c82333; }
+        .empty-msg { text-align: center; color: #777; padding: 20px; font-style: italic; }
+        .loading { text-align: center; color: #4a1118; font-weight: bold; padding: 20px; }
+        .verified-status { color: #28a745; font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 5px;}
+        .protected-text { color: #dc3545; font-size: 12px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="invoice-box" id="invoiceBox">
-        <div class="invoice-header">
-            <div class="invoice-info">
-                <h1>سنتر الذيب</h1>
-                <p>AL-DHEEB CENTER</p>
-                <p>فاتورة طلب</p>
-                <p>التاريخ: <span id="invoiceDate"></span></p>
+    <div class="header">
+        <div class="user-info">
+            <span id="adminNameDisplay">جاري التحميل...</span>
+            <span class="badge badge-blue" title="مدير موثق">
+                <svg viewBox="0 0 24 24"><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>
+            </span>
+        </div>
+        <button class="logout-btn" id="logoutBtn">تسجيل خروج</button>
+    </div>
+
+    <div class="container">
+        <div class="tweet-section" id="tweetSection">
+            <h3>📢 شارك إعلان أو تغريدة للزبائن</h3>
+            <textarea id="tweetInput" class="tweet-input" placeholder="اكتب رسالتك أو عرضك هنا... (ستظهر لجميع الزبائن)"></textarea>
+            <button class="btn-tweet" onclick="postTweet()" id="postBtn">نشر التغريدة</button>
+            <div class="tweet-feed" id="tweetFeed"></div>
+        </div>
+
+        <div class="birthday-section">
+            <h3>🎉 أعياد ميلاد اليوم</h3>
+            <div id="birthdayList">
+                <p style="color: #856404; margin: 0;">جاري البحث عن أعياد الميلاد... ⏳</p>
             </div>
-            <div class="invoice-logo">
-                <img src="https://i.ibb.co/S44qNbT8/1000119201.png" alt="لوجو سنتر الذيب" crossorigin="anonymous">
+        </div>
+
+        <h3 class="section-title">الزبائن المسجلين</h3>
+        <div class="customer-list" id="customerList">
+            <div class="loading">جاري تحميل الزبائن... ⏳</div>
+        </div>
+
+        <!-- قسم سعر الصرف (للمدير وصاحب المركز فقط) -->
+        <div class="exchange-rate-section" id="exchangeRateSection" style="display: none; background: white; border-radius: 10px; padding: 20px; margin-top: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-right: 4px solid #4a1118;">
+            <h3 style="color: #4a1118; margin-top: 0;">💵 تعديل سعر صرف الدولار اليوم</h3>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <input type="number" id="exchangeInput" placeholder="سعر الدولار بالليرة..." style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-family: 'Cairo', sans-serif;">
+                <button onclick="updateExchangeRate()" style="background-color: #4a1118; color: #c9a45c; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; font-family: 'Cairo', sans-serif; cursor: pointer;">حفظ السعر</button>
             </div>
-        </div>
-
-        <div class="customer-details">
-            <p><strong>اسم الزبون:</strong> <span id="customerNameDisplay">جاري التحميل...</span></p>
-            <p><strong>رقم الهاتف:</strong> <span id="customerPhoneDisplay">-</span></p>
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>المنتج</th>
-                    <th style="text-align: center;">الوحدة</th>
-                    <th style="text-align: center;">الكمية</th>
-                    <th style="text-align: center;">إجراء</th>
-                </tr>
-            </thead>
-            <tbody id="invoiceBody"></tbody>
-        </table>
-
-        <div class="delivery-options" id="deliverySection">
-            <h3>طريقة الاستلام:</h3>
-            <div class="radio-group">
-                <label class="radio-label">
-                    <input type="radio" name="delivery" value="pickup" checked onchange="toggleAddress()"> استلام من المركز
-                </label>
-                <label class="radio-label">
-                    <input type="radio" name="delivery" value="delivery" onchange="toggleAddress()"> توصيل (دليفري)
-                </label>
-            </div>
-            <input type="text" id="deliveryAddress" class="address-input" placeholder="اكتب عنوان التوصيل بالتفصيل هنا...">
-        </div>
-
-        <div class="notes-section" id="notesSection">
-            <label>📝 ملاحظات إضافية (اختياري):</label>
-            <textarea id="orderNotes" class="notes-input" placeholder="اكتب أي ملاحظات تخص الطلب هنا... (مثلاً: التوصيل بعد العصر)"></textarea>
-        </div>
-
-        <div class="invoice-footer">
-            <p class="thanks">شكراً لتسوقكم معنا! 🌟</p>
-            <p>يرجى مراجعة الطلب قبل التأكيد النهائي.</p>
+            <p id="currentRateText" style="font-size: 14px; color: #777; margin-top: 10px;">سعر الصرف الحالي غير محدد.</p>
         </div>
     </div>
 
-    <div class="actions">
-        <a href="products.html" class="btn btn-edit">تعديل الطلب</a>
-        <button onclick="saveAndSend()" class="btn btn-save-pdf" id="savePdfBtn">
-            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-            حفظ الفاتورة وإرسال
-        </button>
-        <button onclick="copyOrderDetails()" class="btn btn-whatsapp">
-            <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            نسخ تفاصيل الطلب
-        </button>
-    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, updateDoc, doc, deleteDoc, addDoc, query, orderBy, serverTimestamp, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    <script>
-        // ⚠️ رقم وسام ذيب (مع الصفر)
-        const ownerPhone = "0985164493"; 
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlT3aXjE7Bg6a2gx4YSGH61ybW0sdQS2g",
+            authDomain: "dheeb-brothers.firebaseapp.com",
+            projectId: "dheeb-brothers",
+            storageBucket: "dheeb-brothers.firebasestorage.app",
+            messagingSenderId: "419429945832",
+            appId: "1:419429945832:web:6cf5bc22ec496db576945d",
+            measurementId: "G-GBRL9YKWKE"
+        };
 
-        const customerName = localStorage.getItem('customerName') || 'زبون غير مسجل';
-        const customerPhone = localStorage.getItem('customerPhone') || 'غير متوفر';
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const allowedEmails = ['admin@dheeb.com', 'wesam@dheeb.com']; 
         
-        document.getElementById('customerNameDisplay').innerText = customerName;
-        document.getElementById('customerPhoneDisplay').innerText = customerPhone;
+        let isSuperAdmin = false; 
+        let isPartner = false; 
 
-        const today = new Date();
-        document.getElementById('invoiceDate').innerText = today.toLocaleDateString('ar-EG');
-
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        const invoiceBody = document.getElementById('invoiceBody');
-
-        window.toggleAddress = function() {
-            const deliveryRadio = document.querySelector('input[name="delivery"]:checked').value;
-            const addressInput = document.getElementById('deliveryAddress');
-            if (deliveryRadio === 'delivery') {
-                addressInput.style.display = 'block';
-            } else {
-                addressInput.style.display = 'none';
-                addressInput.value = ''; 
-            }
-        }
-
-        function renderInvoice() {
-            invoiceBody.innerHTML = '';
-            
-            if (cart.length === 0) {
-                invoiceBody.innerHTML = '<tr><td colspan="4" class="empty-msg">السلة فاضية! اذهب لتصفح المنتجات وإضافة منتجات.</td></tr>';
-                return;
-            }
-
-            cart.forEach((item, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="item-name">${item.name}</td>
-                    <td style="text-align: center;">${item.unit}</td>
-                    <td class="item-qty">${item.quantity}</td>
-                    <td style="text-align: center;">
-                        <button onclick="removeItem(${index})" style="background:none; border:none; color:#dc3545; cursor:pointer; font-weight:900; font-size: 18px;">✖</button>
-                    </td>
-                `;
-                invoiceBody.appendChild(row);
-            });
-        }
-
-        window.removeItem = function(index) {
-            if(confirm('هل تريد إزالة هذا المنتج من الطلب؟')) {
-                cart.splice(index, 1);
-                localStorage.setItem('cart', JSON.stringify(cart));
-                renderInvoice();
-            }
-        }
-
-        // دالة الحفظ والإرسال
-        window.saveAndSend = function() {
-            if (cart.length === 0) {
-                alert("السلة فاضية، لا يمكن حفظ فاتورة.");
-                return;
-            }
-
-            // فحص العنوان
-            const isDeliveryCheck = document.querySelector('input[name="delivery"]:checked').value === 'delivery';
-            const addressCheck = document.getElementById('deliveryAddress').value.trim();
-            
-            if (isDeliveryCheck && addressCheck === '') {
-                alert('⚠️ يرجى كتابة عنوان التوصيل بالتفصيل قبل تأكيد الطلب.');
-                document.getElementById('deliveryAddress').focus();
-                return; 
-            }
-            
-            const btn = document.getElementById('savePdfBtn');
-            btn.innerHTML = "جاري المعالجة...";
-
-            const invoiceBox = document.getElementById('invoiceBox');
-            const deleteButtons = document.querySelectorAll('#invoiceBody button');
-            deleteButtons.forEach(b => b.style.visibility = 'hidden');
-            
-            const deliverySection = document.getElementById('deliverySection');
-            const radioGroup = deliverySection.querySelector('.radio-group');
-            const addressInput = document.getElementById('deliveryAddress');
-            const isDelivery = document.querySelector('input[name="delivery"]:checked').value === 'delivery';
-            
-            const tempDeliveryInfo = document.createElement('p');
-            tempDeliveryInfo.id = 'tempDeliveryInfo';
-            tempDeliveryInfo.style.margin = '8px 0';
-            tempDeliveryInfo.style.fontSize = '16px';
-            tempDeliveryInfo.style.fontWeight = '700';
-            tempDeliveryInfo.style.color = '#4a1118';
-            
-            if (isDelivery) {
-                tempDeliveryInfo.innerHTML = `<strong>طريقة الاستلام:</strong> توصيل (دليفري)<br><strong>العنوان:</strong> ${addressInput.value || 'لم يتم تحديد العنوان'}`;
-            } else {
-                tempDeliveryInfo.innerHTML = `<strong>طريقة الاستلام:</strong> استلام من المركز`;
-            }
-            
-            deliverySection.insertBefore(tempDeliveryInfo, radioGroup);
-            radioGroup.style.display = 'none';
-            addressInput.style.display = 'none';
-            deliverySection.querySelector('h3').style.display = 'none';
-
-            const notesSection = document.getElementById('notesSection');
-            const notesInput = document.getElementById('orderNotes');
-            const tempNotes = document.createElement('p');
-            tempNotes.id = 'tempNotes';
-            tempNotes.style.margin = '8px 0';
-            tempNotes.style.fontSize = '16px';
-            tempNotes.style.fontWeight = '700';
-            tempNotes.style.color = '#4a1118';
-            
-            if (notesInput.value.trim() !== '') {
-                tempNotes.innerHTML = `<strong>ملاحظات:</strong> ${notesInput.value}`;
-                notesSection.insertBefore(tempNotes, notesInput);
-                notesInput.style.display = 'none';
-                notesSection.querySelector('label').style.display = 'none';
-            } else {
-                notesSection.style.display = 'none';
-            }
-
-            html2canvas(invoiceBox, { 
-                scale: 3, 
-                backgroundColor: '#ffffff',
-                useCORS: true 
-            }).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                
-                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                
-                // 🔥 اسم ملف الـ PDF الجديد
-                const fileName = `فاتورة الزبون ${customerName} من سنتر الذيب.pdf`;
-                pdf.save(fileName);
-
-                deleteButtons.forEach(b => b.style.visibility = 'visible');
-                radioGroup.style.display = 'flex';
-                deliverySection.querySelector('h3').style.display = 'block';
-                if(isDelivery) addressInput.style.display = 'block';
-                tempDeliveryInfo.remove();
-                
-                if (notesInput.value.trim() !== '') {
-                    notesInput.style.display = 'block';
-                    notesSection.querySelector('label').style.display = 'block';
-                    tempNotes.remove();
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (allowedEmails.includes(user.email)) {
+                    document.getElementById('tweetSection').style.display = 'block';
+                    document.getElementById('exchangeRateSection').style.display = 'block'; // إظهار خانة السعر
+                    loadCurrentRate(); // جلب السعر الحالي
+                    
+                    if (user.email === 'admin@dheeb.com') {
+                        document.getElementById('adminNameDisplay').innerText = "شهاب الحمدان";
+                        isSuperAdmin = true; 
+                        isPartner = false;
+                    } else if (user.email === 'wesam@dheeb.com') {
+                        document.getElementById('adminNameDisplay').innerText = "وسام ذيب"; 
+                        isSuperAdmin = false; 
+                        isPartner = true;
+                    }
+                    loadTweets(); 
                 } else {
-                    notesSection.style.display = 'block';
+                    document.getElementById('tweetSection').style.display = 'none';
+                    document.getElementById('exchangeRateSection').style.display = 'none';
+                    document.getElementById('adminNameDisplay').innerText = "لوحة الإدارة";
                 }
-                
-                btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> حفظ الفاتورة وإرسال`;
+                loadCustomers();
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
 
-                // عرض رسالة النجاح مع زر الواتساب
-                const waLink = `https://wa.me/${ownerPhone}?text=مرحباً%2C%20أنا%20الزبون%20${encodeURIComponent(customerName)}%2C%20لقد%20قمت%20بحفظ%20فاتورة%20طلبي%20كملف%20PDF.%20سأقوم%20بإرفاقها%20الآن.`;
-                
-                const popup = document.createElement('div');
-                popup.style.cssText = `
-                    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                    background-color: white; padding: 25px; border-radius: 12px;
-                    box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 9999;
-                    text-align: center; font-family: 'Cairo', sans-serif; max-width: 350px;
-                    border: 2px solid #4a1118;
-                `;
-                popup.innerHTML = `
-                    <h3 style="color: #4a1118; margin-top: 0;">✅ تم حفظ الفاتورة بنجاح!</h3>
-                    <p style="color: #555;">تم حفظ الملف باسم "فاتورة الزبون ${customerName} من سنتر الذيب.pdf"</p>
-                    <p style="color: #555; font-size: 14px;">الآن اضغط على الزر بالأسفل لفتح الواتساب، ثم أرفق ملف الـ PDF وأرسله.</p>
-                    <a href="${waLink}" target="_blank" style="display: block; background-color: #25D366; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 15px;">فتح الواتساب وإرفاق الفاتورة</a>
-                    <button onclick="this.parentElement.remove()" style="background: none; border: none; color: #999; margin-top: 10px; cursor: pointer; font-family: 'Cairo', sans-serif;">إغلاق</button>
-                `;
-                document.body.appendChild(popup);
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => window.location.href = 'login.html');
+        });
 
-            }).catch(err => {
-                alert("حدث خطأ أثناء حفظ الفاتورة: " + err);
-                deleteButtons.forEach(b => b.style.visibility = 'visible');
-                radioGroup.style.display = 'flex';
-                deliverySection.querySelector('h3').style.display = 'block';
-                if(isDelivery) addressInput.style.display = 'block';
-                if(tempDeliveryInfo) tempDeliveryInfo.remove();
-                if(tempNotes) tempNotes.remove();
-                notesInput.style.display = 'block';
-                notesSection.querySelector('label').style.display = 'block';
-                notesSection.style.display = 'block';
-                btn.innerHTML = "حفظ الفاتورة وإرسال";
-            });
-        }
-
-        // دالة نسخ تفاصيل الطلب
-        window.copyOrderDetails = function() {
-            if (cart.length === 0) {
-                alert("السلة فاضية، لا يمكن نسخ تفاصيل.");
+        // --- دوال سعر الصرف ---
+        window.updateExchangeRate = async function() {
+            const rateInput = document.getElementById('exchangeInput').value;
+            if (!rateInput || rateInput <= 0) {
+                alert("الرجاء إدخال سعر صرف صحيح.");
                 return;
             }
 
-            const isDelivery = document.querySelector('input[name="delivery"]:checked').value === 'delivery';
-            const address = document.getElementById('deliveryAddress').value;
-            const notes = document.getElementById('orderNotes').value;
-
-            let message = `مرحباً، أنا الزبون: ${customerName}\n`;
-            message += `طريقة الاستلام: ${isDelivery ? 'توصيل (دليفري)' : 'استلام من المركز'}\n`;
-            
-            if (isDelivery) {
-                message += `العنوان: ${address || 'لم يتم تحديد العنوان'}\n`;
+            try {
+                const today = new Date().toLocaleDateString('ar-EG');
+                await setDoc(doc(db, "settings", "exchangeRate"), {
+                    rate: rateInput,
+                    date: today
+                });
+                
+                alert("تم حفظ سعر الصرف بنجاح! سيظهر للزبائن فوراً.");
+                document.getElementById('exchangeInput').value = '';
+                document.getElementById('currentRateText').innerText = `السعر الحالي: ${rateInput} ل.س (تم التحديث: ${today})`;
+            } catch (error) {
+                console.error(error);
+                alert("حدث خطأ أثناء حفظ السعر: " + error.message);
             }
-            
-            if (notes.trim() !== '') {
-                message += `📝 ملاحظات: ${notes}\n`;
-            }
-            
-            message += `\n📦 *تفاصيل الطلب:*\n`;
-            cart.forEach(item => {
-                message += `- ${item.name} | ${item.quantity} ${item.unit}\n`;
-            });
-
-            message += `\nلقد قمت بتجهيز فاتورة طلبي، وهي مرفقة كصورة. يرجى تأكيد الطلب. شكراً!`;
-
-            navigator.clipboard.writeText(message).then(() => {
-                alert('✅ تم نسخ تفاصيل طلبك بنجاح!\n\n📱 الآن افتح تطبيق الواتساب، اذهب لمحادثة "سنتر الذيب"، الصق النص هنا، وأرفق صورة الفاتورة (اللي حفظتها كـ PDF أو صورة).\n\nشكراً لتسوقك معنا!');
-            }).catch(err => {
-                prompt("انسخ النص التالي وأرسله للواتساب:", message);
-            });
         }
 
-        renderInvoice();
+        async function loadCurrentRate() {
+            try {
+                const docRef = doc(db, "settings", "exchangeRate");
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('currentRateText').innerText = `السعر الحالي: ${data.rate} ل.س (آخر تحديث: ${data.date})`;
+                    document.getElementById('exchangeInput').value = data.rate;
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // --- كود التغريدات ---
+        window.postTweet = async function() {
+            const text = document.getElementById('tweetInput').value.trim();
+            const btn = document.getElementById('postBtn');
+            const currentName = document.getElementById('adminNameDisplay').innerText;
+            
+            if (!text) { alert('الرجاء كتابة نص التغريدة أولاً.'); return; }
+
+            btn.innerText = 'جاري النشر...';
+            btn.disabled = true;
+
+            try {
+                await addDoc(collection(db, "announcements"), {
+                    text: text,
+                    author: currentName,
+                    role: "صاحب المركز", 
+                    createdAt: serverTimestamp()
+                });
+                document.getElementById('tweetInput').value = '';
+                loadTweets(); 
+            } catch (error) {
+                alert('حدث خطأ أثناء النشر: ' + error.message);
+            } finally {
+                btn.innerText = 'نشر التغريدة';
+                btn.disabled = false;
+            }
+        }
+
+        async function loadTweets() {
+            const feed = document.getElementById('tweetFeed');
+            if(!feed) return;
+            try {
+                const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                feed.innerHTML = '';
+                if (querySnapshot.empty) {
+                    feed.innerHTML = '<p class="empty-msg">لا يوجد تغريدات منشورة بعد.</p>';
+                    return;
+                }
+                querySnapshot.forEach((doc) => {
+                    const tweet = doc.data();
+                    const div = document.createElement('div');
+                    div.className = 'tweet-card';
+                    let dateStr = '';
+                    if (tweet.createdAt) {
+                        dateStr = tweet.createdAt.toDate().toLocaleString('ar-EG');
+                    }
+                    div.innerHTML = `
+                        <div class="tweet-author">
+                            ${tweet.author}
+                            <span class="badge badge-blue" title="موثق" style="width:16px; height:16px;">
+                                <svg viewBox="0 0 24 24"><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>
+                            </span>
+                        </div>
+                        <span class="tweet-role">${tweet.role}</span>
+                        <div class="tweet-text">${tweet.text}</div>
+                        <span class="tweet-date">${dateStr}</span>
+                    `;
+                    feed.appendChild(div);
+                });
+            } catch (error) { feed.innerHTML = `<p style="color:red;">خطأ: ${error.message}</p>`; }
+        }
+
+        // --- كود أعياد الميلاد ---
+        function checkBirthdays(customersData) {
+            const today = new Date();
+            const todayMonth = today.getMonth() + 1; 
+            const todayDay = today.getDate();
+            const birthdayContainer = document.getElementById('birthdayList');
+            if(!birthdayContainer) return;
+            birthdayContainer.innerHTML = '';
+            let hasBirthday = false;
+
+            customersData.forEach(customer => {
+                if (!customer.dob) return;
+                const dobParts = customer.dob.split('-');
+                if (dobParts.length === 3) {
+                    const dobMonth = parseInt(dobParts[1]);
+                    const dobDay = parseInt(dobParts[2]);
+                    if (dobMonth === todayMonth && dobDay === todayDay) {
+                        hasBirthday = true;
+                        let phone = customer.phone;
+                        if (phone.startsWith('0')) phone = '963' + phone.substring(1);
+                        const message = encodeURIComponent(`كل عام وأنت بخير يا ${customer.fullName}! 🎂 نتمنى لك عاماً سعيداً ومليء بالبركة من سنتر الذيب.`);
+                        const waLink = `https://wa.me/${phone}?text=${message}`;
+
+                        const div = document.createElement('div');
+                        div.className = 'birthday-item';
+                        div.innerHTML = `
+                            <div>
+                                <strong style="color: #4a1118; font-size: 16px;">🎈 ${customer.fullName}</strong>
+                                <span style="color: #777; font-size: 14px;"> (${customer.phone})</span>
+                            </div>
+                            <a href="${waLink}" target="_blank" class="btn-whatsapp">إرسال تهنئة 💬</a>
+                        `;
+                        birthdayContainer.appendChild(div);
+                    }
+                }
+            });
+            if (!hasBirthday) birthdayContainer.innerHTML = '<p style="color: #856404; margin: 0;">لا يوجد أعياد ميلاد اليوم. 🍃</p>';
+        }
+
+        // --- كود الزبائن (الصلاحيات) ---
+        async function loadCustomers() {
+            const listContainer = document.getElementById('customerList');
+            if(!listContainer) return;
+            
+            try {
+                const querySnapshot = await getDocs(collection(db, "customers"));
+                listContainer.innerHTML = ''; 
+
+                if (querySnapshot.empty) {
+                    listContainer.innerHTML = '<div class="empty-msg">لا يوجد زبائن مسجلين حالياً.</div>';
+                    checkBirthdays([]);
+                    return;
+                }
+
+                let customersArray = [];
+
+                querySnapshot.forEach((docSnap) => {
+                    const customer = docSnap.data();
+                    const customerId = docSnap.id;
+                    customersArray.push(customer);
+
+                    const div = document.createElement('div');
+                    div.className = 'customer-item';
+                    
+                    let actionButtonsHTML = '';
+                    
+                    const isTargetingSuperAdmin = (customer.fullName === 'شهاب الحمدان' || customer.email === 'admin@dheeb.com');
+
+                    if (isSuperAdmin) {
+                        if (customer.isVerified) {
+                            actionButtonsHTML = `
+                                <div class="action-buttons">
+                                    <button class="btn btn-unverify" onclick="toggleVerify('${customerId}', false, '${isTargetingSuperAdmin}')">إلغاء التوثيق</button>
+                                    <button class="btn btn-delete" onclick="deleteCustomer('${customerId}', true, '${isTargetingSuperAdmin}')">حذف الحساب</button>
+                                </div>
+                            `;
+                        } else {
+                            actionButtonsHTML = `
+                                <div class="action-buttons">
+                                    <button class="btn btn-verify" onclick="toggleVerify('${customerId}', true, '${isTargetingSuperAdmin}')">توثيق الحساب</button>
+                                    <button class="btn btn-delete" onclick="deleteCustomer('${customerId}', false, '${isTargetingSuperAdmin}')">حذف الحساب</button>
+                                </div>
+                            `;
+                        }
+                    } else if (isPartner) {
+                        if (isTargetingSuperAdmin) {
+                            actionButtonsHTML = `<span class="protected-text">(محمي)</span>`;
+                        } else {
+                            if (customer.isVerified) {
+                                actionButtonsHTML = `
+                                    <div class="action-buttons">
+                                        <button class="btn btn-unverify" onclick="toggleVerify('${customerId}', false, '${isTargetingSuperAdmin}')">إلغاء التوثيق</button>
+                                        <button class="btn btn-delete" onclick="deleteCustomer('${customerId}', true, '${isTargetingSuperAdmin}')">حذف الحساب</button>
+                                    </div>
+                                `;
+                            } else {
+                                actionButtonsHTML = `
+                                    <div class="action-buttons">
+                                        <button class="btn btn-verify" onclick="toggleVerify('${customerId}', true, '${isTargetingSuperAdmin}')">توثيق الحساب</button>
+                                        <button class="btn btn-delete" onclick="deleteCustomer('${customerId}', false, '${isTargetingSuperAdmin}')">حذف الحساب</button>
+                                    </div>
+                                `;
+                            }
+                        }
+                    }
+
+                    const verificationBadge = customer.isVerified 
+                        ? `<span class="badge badge-green" title="زبون موثق"><svg viewBox="0 0 24 24"><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg></span>` 
+                        : '';
+
+                    div.innerHTML = `
+                        <div class="customer-info">
+                            <span class="customer-name">${customer.fullName}${verificationBadge}</span>
+                            <span class="customer-details">📞 ${customer.phone} | 🎂 ${customer.dob}</span>
+                        </div>
+                        <div>${actionButtonsHTML}</div>
+                    `;
+                    listContainer.appendChild(div);
+                });
+
+                checkBirthdays(customersArray);
+
+            } catch (error) {
+                listContainer.innerHTML = `<div class="error-msg">حدث خطأ في تحميل البيانات: ${error.message}</div>`;
+            }
+        }
+
+        window.toggleVerify = async function(customerId, isVerified, isProtected) {
+            if (isPartner && isProtected === 'true') {
+                alert("عذراً، لا يمكنك تعديل توثيق هذا الحساب (محمي).");
+                return;
+            }
+            if (!isSuperAdmin && !isPartner) { alert("عذراً، لا تملك صلاحية."); return; }
+            
+            const actionText = isVerified ? 'توثيق' : 'إلغاء توثيق';
+            if(confirm(`هل أنت متأكد من ${actionText} هذا الزبون؟`)) {
+                try {
+                    await updateDoc(doc(db, "customers", customerId), { isVerified: isVerified });
+                    alert(`تم ${actionText} الزبون بنجاح!`);
+                    loadCustomers(); 
+                } catch (error) { alert('حدث خطأ: ' + error.message); }
+            }
+        }
+
+        window.deleteCustomer = async function(customerId, isVerified, isProtected) {
+            if (isPartner && isProtected === 'true') {
+                alert("عذراً، هذا الحساب محمي ولا يمكنك حذفه.");
+                return;
+            }
+
+            if(confirm('هل أنت متأكد من حذف هذا الحساب نهائياً؟')) {
+                try {
+                    await deleteDoc(doc(db, "customers", customerId));
+                    alert('تم حذف الحساب بنجاح!');
+                    loadCustomers(); 
+                } catch (error) { alert('حدث خطأ أثناء الحذف: ' + error.message); }
+            }
+        }
+
     </script>
 
 </body>
