@@ -127,8 +127,8 @@
     </div>
 
     <script>
-        // ⚠️ تم إضافة مفتاح دولة سوريا (963) وإزالة الصفر
-        const ownerPhone = "963985164493"; 
+        // ⚠️ رقم وسام ذيب (مع الصفر)
+        const ownerPhone = "0985164493"; 
 
         const customerName = localStorage.getItem('customerName') || 'زبون غير مسجل';
         const customerPhone = localStorage.getItem('customerPhone') || 'غير متوفر';
@@ -183,12 +183,14 @@
             }
         }
 
+        // دالة الحفظ والإرسال
         window.saveAndSend = function() {
             if (cart.length === 0) {
                 alert("السلة فاضية، لا يمكن حفظ فاتورة.");
                 return;
             }
 
+            // فحص العنوان
             const isDeliveryCheck = document.querySelector('input[name="delivery"]:checked').value === 'delivery';
             const addressCheck = document.getElementById('deliveryAddress').value.trim();
             
@@ -261,6 +263,7 @@
                 
                 pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
                 
+                // 🔥 اسم ملف الـ PDF الجديد
                 const fileName = `فاتورة الزبون ${customerName} من سنتر الذيب.pdf`;
                 pdf.save(fileName);
 
@@ -280,6 +283,7 @@
                 
                 btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> حفظ الفاتورة وإرسال`;
 
+                // عرض رسالة النجاح مع زر الواتساب
                 const waLink = `https://wa.me/${ownerPhone}?text=مرحباً%2C%20أنا%20الزبون%20${encodeURIComponent(customerName)}%2C%20لقد%20قمت%20بحفظ%20فاتورة%20طلبي%20كملف%20PDF.%20سأقوم%20بإرفاقها%20الآن.`;
                 
                 const popup = document.createElement('div');
@@ -314,6 +318,7 @@
             });
         }
 
+        // دالة نسخ تفاصيل الطلب
         window.copyOrderDetails = function() {
             if (cart.length === 0) {
                 alert("السلة فاضية، لا يمكن نسخ تفاصيل.");
