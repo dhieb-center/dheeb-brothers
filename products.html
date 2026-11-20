@@ -70,7 +70,6 @@
     </div>
 
     <script>
-        // English Variables & Functions (Professional Code)
         let allProducts = []; 
         let displayedProducts = []; 
         let currentIndex = 0; 
@@ -194,13 +193,17 @@
                     const cols = row.split(',');
                     return {
                         name: cols[0] ? cols[0].trim() : 'منتج',
-                        category: cols[1] ? cols[1].trim() : 'غير مصنف',
+                        category: cols[1] ? cols[1].trim() : '', // إذا ما في قسم، بنخليه فاضي
                         image: cols[2] ? cols[2].trim() : 'https://i.ibb.co/S44qNbT8/1000119201.png'
                     };
-                });
+                }).filter(p => p.name !== ''); // إخفاء أي سطر فاضي
 
-                const categories = ['الكل', ...new Set(allProducts.map(p => p.category))];
+                // هون بنشيل أي قسم فاضي من الأزرار
+                const uniqueCategories = [...new Set(allProducts.map(p => p.category))].filter(cat => cat !== '');
+                const categories = ['الكل', ...uniqueCategories];
+                
                 const catBar = document.getElementById('categoriesBar');
+                catBar.innerHTML = '';
                 categories.forEach(cat => {
                     const btn = document.createElement('button');
                     btn.className = cat === 'الكل' ? 'category-btn active' : 'category-btn';
