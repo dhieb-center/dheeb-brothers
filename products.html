@@ -15,14 +15,9 @@
         .search-box { width: 100%; padding: 15px; margin-bottom: 15px; border: 2px solid #c9a45c; border-radius: 8px; font-family: 'Cairo', sans-serif; font-size: 16px; box-sizing: border-box; }
 
         /* أزرار التصنيفات */
-        .categories-bar { display: flex; overflow-x: auto; gap: 10px; margin-bottom: 10px; padding-bottom: 10px; }
+        .categories-bar { display: flex; overflow-x: auto; gap: 10px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px dashed #ccc;}
         .category-btn { background-color: white; color: #4a1118; border: 2px solid #c9a45c; padding: 8px 20px; border-radius: 50px; font-family: 'Cairo', sans-serif; font-weight: bold; cursor: pointer; white-space: nowrap; transition: 0.3s; }
         .category-btn.active { background-color: #4a1118; color: #c9a45c; border-color: #4a1118; }
-
-        /* أزرار الشركات */
-        .companies-bar { display: flex; overflow-x: auto; gap: 10px; margin-bottom: 20px; padding-bottom: 10px; border-top: 1px dashed #ccc; padding-top: 10px;}
-        .company-btn { background-color: #f4f6f9; color: #4a1118; border: 1px solid #ccc; padding: 5px 15px; border-radius: 5px; font-family: 'Cairo', sans-serif; font-size: 13px; cursor: pointer; }
-        .company-btn.active { background-color: #c9a45c; color: white; border-color: #c9a45c; }
 
         .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         @media(min-width: 768px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -61,7 +56,6 @@
     <input type="text" id="searchInput" class="search-box" placeholder="ابحث عن منتج... (اكتب اسم المنتج)">
 
     <div class="categories-bar" id="categoriesBar"></div>
-    <div class="companies-bar" id="companiesBar"></div>
 
     <div id="loading" class="loading">جاري تحميل المنتجات... ⏳</div>
     <div class="products-grid" id="productsGrid"></div>
@@ -83,25 +77,52 @@
         let cart = JSON.parse(localStorage.getItem('cart')) || []; 
 
         // --- مكتبة الصور التعبيرية لكل قسم ---
-        // تأكد إن اسم القسم في ملف الـ CSV مطابق تماماً للاسم هون
         const categoryIcons = {
-            'حبوب': 'https://cdn-icons-png.flaticon.com/512/3081/3081847.png',
-            'بقوليات': 'https://cdn-icons-png.flaticon.com/512/2674/2674516.png',
-            'خضروات': 'https://cdn-icons-png.flaticon.com/512/2940/2940133.png',
-            'فواكه': 'https://cdn-icons-png.flaticon.com/512/3150/3150442.png',
-            'ألبان': 'https://cdn-icons-png.flaticon.com/512/3081/3081847.png',
+            'حبوب وبقوليات': 'https://cdn-icons-png.flaticon.com/512/3081/3081847.png',
             'معلبات': 'https://cdn-icons-png.flaticon.com/512/2674/2674516.png',
-            'مكسرات': 'https://cdn-icons-png.flaticon.com/512/2940/2940133.png',
-            'بهارات': 'https://cdn-icons-png.flaticon.com/512/3150/3150442.png',
+            'مونة': 'https://cdn-icons-png.flaticon.com/512/2940/2940133.png',
+            'حلويات ومونة': 'https://cdn-icons-png.flaticon.com/512/3150/3150442.png',
             'بسكويت وسناكس': 'https://cdn-icons-png.flaticon.com/512/2553/2553642.png',
-            'شوكولا وحلويات': 'https://cdn-icons-png.flaticon.com/512/3081/3081847.png',
-            'مشروبات': 'https://cdn-icons-png.flaticon.com/512/2674/2674516.png',
+            'ألبان وأجبان': 'https://cdn-icons-png.flaticon.com/512/3081/3081847.png',
+            'مشروبات ساخنة': 'https://cdn-icons-png.flaticon.com/512/2674/2674516.png',
             'منظفات': 'https://cdn-icons-png.flaticon.com/512/2940/2940133.png',
-            'كلور': 'https://cdn-icons-png.flaticon.com/512/3150/3150442.png',
-            'شامبو': 'https://cdn-icons-png.flaticon.com/512/3081/3081847.png',
-            'أدوات منزلية': 'https://cdn-icons-png.flaticon.com/512/2553/2553642.png',
+            'بهارات ومكسرات': 'https://cdn-icons-png.flaticon.com/512/3150/3150442.png',
             'أخرى': 'https://cdn-icons-png.flaticon.com/512/679/679720.png' 
         };
+
+        // --- دالة التصنيف الذكي بناءً على الكلمات المفتاحية ---
+        function determineCategory(productName) {
+            const name = productName.toLowerCase();
+            
+            // كلمات مفتاحية للمعلبات
+            if (name.includes('طون') || name.includes('تونة') || name.includes('سردين') || name.includes('فول') || name.includes('حمص') || name.includes('ذرة') || name.includes('بازيلا') || name.includes('فطر') || name.includes('معلب')) return 'معلبات';
+            
+            // كلمات مفتاحية للمونة (زيتون، مكدوس، خل، رب، دبس، مخلل)
+            if (name.includes('زيتون') || name.includes('مكدوس') || name.includes('خل') || name.includes('رب') || name.includes('دبس') || name.includes('مخلل') || name.includes('زيت') || name.includes('طحينة')) return 'مونة';
+            
+            // كلمات مفتاحية للحلويات والمونة (حلاوة، عسل، مربى، تمر)
+            if (name.includes('حلاوة') || name.includes('عسل') || name.includes('مربى') || name.includes('تمر') || name.includes('قمر الدين') || name.includes('راحة')) return 'حلويات ومونة';
+            
+            // كلمات مفتاحية للبسكويت والسناكس (شوكولا، كيك، بسكويت، شيبس، جيلي)
+            if (name.includes('بسكويت') || name.includes('بسكوت') || name.includes('شوكولا') || name.includes('شوكو') || name.includes('كيك') || name.includes('شيبس') || name.includes('جيلي') || name.includes('مارشميلو') || name.includes('مصاص') || name.includes('علكة')) return 'بسكويت وسناكس';
+            
+            // كلمات مفتاحية للألبان والأجبان
+            if (name.includes('جبنة') || name.includes('لبن') || name.includes('لبنة') || name.includes('زبدة') || name.includes('قشطة') || name.includes('سمن') || name.includes('حليب')) return 'ألبان وأجبان';
+            
+            // كلمات مفتاحية للمشروبات الساخنة (بن، قهوة، شاي، نسكافيه)
+            if (name.includes('بن ') || name.includes('قهوة') || name.includes('شاي') || name.includes('نسكافيه') || name.includes('كابتشينو') || name.includes('هوت شوكلت')) return 'مشروبات ساخنة';
+            
+            // كلمات مفتاحية للحبوب والبقوليات (رز، برغل، عدس، فريكة، طحين، سكر)
+            if (name.includes('رز') || name.includes('برغل') || name.includes('عدس') || name.includes('فريكة') || name.includes('طحين') || name.includes('سكر') || name.includes('سميد') || name.includes('معكرونة') || name.includes('سباغيتي')) return 'حبوب وبقوليات';
+            
+            // كلمات مفتاحية للمنظفات
+            if (name.includes('صابون') || name.includes('شامبو') || name.includes('مسحوق') || name.includes('كلور') || name.includes('منظف') || name.includes('معطر') || name.includes('جلي') || name.includes('ديتول')) return 'منظفات';
+            
+            // كلمات مفتاحية للبهارات والمكسرات
+            if (name.includes('زعتر') || name.includes('شطة') || name.includes('بهار') || name.includes('فلفل') || name.includes('قرفة') || name.includes('كمون') || name.includes('مكسرات') || name.includes('لوز') || name.includes('فستق') || name.includes('كاجو')) return 'بهارات ومكسرات';
+            
+            return 'أخرى';
+        }
 
         function updateCartCount() {
             let total = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -139,3 +160,144 @@
         function createProductCard(product) {
             const uniqueId = product.name.replace(/\s/g, '-'); 
             const card = document.createElement('div');
+            card.className = 'product-card';
+            
+            const iconUrl = categoryIcons[product.category] || categoryIcons['أخرى'];
+
+            const units = ['قطعة', 'كيلو', 'لتر', 'علبة', 'كيس'];
+            let unitOptions = units.map(u => `<option value="${u}">${u}</option>`).join('');
+
+            card.innerHTML = `
+                <img src="${iconUrl}" class="product-icon" alt="${product.category}">
+                <div class="product-name">${product.name}</div>
+                <div class="cart-controls">
+                    <select id="unit-${uniqueId}" class="unit-selector">
+                        ${unitOptions}
+                    </select>
+                    <input type="number" id="qty-${uniqueId}" value="1" min="0.1" step="0.1" class="qty-input" placeholder="الكمية">
+                    <button class="add-btn" onclick="addToCart('${uniqueId}', '${product.name}', this)">إضافة للسلة</button>
+                </div>
+            `;
+            return card;
+        }
+
+        function renderNextBatch() {
+            const grid = document.getElementById('productsGrid');
+            const nextBatch = displayedProducts.slice(currentIndex, currentIndex + PRODUCTS_PER_PAGE);
+            
+            nextBatch.forEach(product => {
+                grid.appendChild(createProductCard(product));
+            });
+
+            currentIndex += PRODUCTS_PER_PAGE;
+
+            if (currentIndex >= displayedProducts.length) {
+                document.getElementById('loadMoreContainer').classList.add('hidden');
+            } else {
+                document.getElementById('loadMoreContainer').classList.remove('hidden');
+            }
+        }
+
+        function loadMoreProducts() { renderNextBatch(); }
+
+        function renderSearchResults(productsToRender) {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = ''; 
+            if (productsToRender.length === 0) {
+                grid.innerHTML = '<p style="text-align:center; grid-column: 1/-1; font-size: 18px; color: #777;">لا يوجد منتجات مطابقة للبحث</p>';
+                document.getElementById('loadMoreContainer').classList.add('hidden');
+                return;
+            }
+            productsToRender.forEach(product => {
+                grid.appendChild(createProductCard(product));
+            });
+            document.getElementById('loadMoreContainer').classList.add('hidden');
+        }
+
+        function filterCategory(category, btnElement) {
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            document.getElementById('searchInput').value = ''; 
+
+            if (category === 'الكل') {
+                displayedProducts = allProducts;
+            } else {
+                displayedProducts = allProducts.filter(p => p.category === category);
+            }
+            
+            document.getElementById('productsGrid').innerHTML = '';
+            currentIndex = 0;
+            renderNextBatch();
+        }
+
+        async function loadProducts() {
+            try {
+                const response = await fetch('products.csv');
+                if (!response.ok) throw new Error("File not found");
+                const data = await response.text();
+                // التعامل مع الأسطر التي قد تحتوي على فواصل داخل الأسماء
+                const rows = data.split('\n').filter(row => row.trim() !== '');
+                document.getElementById('loading').style.display = 'none';
+
+                // قراءة ملفك: العمود الأول رقم، الثاني رمز، الثالث هو الاسم
+                allProducts = rows.slice(1).map(row => {
+                    // استخدام التعبير النمطي لتجاهل الأرقام والرموز وجلب الاسم فقط
+                    // أو ببساطة تقسيم السطر بـ فاصلة وأخذ الجزء الثالث
+                    const cols = row.split(',');
+                    let name = '';
+                    if(cols.length >= 3) {
+                        name = cols[2].trim();
+                    } else {
+                        name = row.trim(); // احتياطي
+                    }
+                    
+                    return {
+                        name: name,
+                        category: determineCategory(name)
+                    };
+                }).filter(p => p.name !== '' && p.name !== 'الاسم' && p.name !== 'غذائيات');
+
+                // بناء أزرار الأقسام
+                const uniqueCategories = ['الكل', ...new Set(allProducts.map(p => p.category))];
+                const catBar = document.getElementById('categoriesBar');
+                catBar.innerHTML = '';
+                uniqueCategories.forEach(cat => {
+                    const btn = document.createElement('button');
+                    btn.className = cat === 'الكل' ? 'category-btn active' : 'category-btn';
+                    btn.innerText = cat;
+                    btn.onclick = () => filterCategory(cat, btn);
+                    catBar.appendChild(btn);
+                });
+
+                displayedProducts = allProducts;
+                renderNextBatch();
+
+            } catch (error) {
+                document.getElementById('loading').innerText = "حدث خطأ في تحميل ملف المنتجات. تأكد من وجود ملف products.csv بجانب هذا الملف.";
+                console.error(error);
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.trim().toLowerCase();
+            
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            const allBtn = document.querySelector('.category-btn');
+            if(allBtn) allBtn.classList.add('active');
+
+            if (searchTerm === '') {
+                displayedProducts = allProducts;
+                document.getElementById('productsGrid').innerHTML = '';
+                currentIndex = 0;
+                renderNextBatch();
+            } else {
+                const filtered = allProducts.filter(p => p.name.toLowerCase().includes(searchTerm));
+                renderSearchResults(filtered);
+            }
+        });
+
+        loadProducts();
+    </script>
+
+</body>
+</html>
