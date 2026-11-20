@@ -23,7 +23,7 @@
         .btn-tweet { background-color: #4a1118; color: #c9a45c; border: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; font-family: 'Cairo', sans-serif; cursor: pointer; transition: 0.3s; font-size: 16px; }
         .btn-tweet:hover { background-color: #6b1a24; color: white; }
         .tweet-feed { margin-top: 20px; }
-        .tweet-card { background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; padding: 15px; margin-bottom: 15px; text-align: right; }
+        .tweet-card { background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; padding: 15px; margin-bottom: 15px; text-align: right; position: relative; }
         .tweet-author { font-weight: bold; color: #4a1118; display: flex; align-items: center; gap: 5px; font-size: 16px;}
         .tweet-role { font-size: 11px; color: #c9a45c; font-weight: bold; margin-bottom: 10px; display: block;}
         .tweet-text { font-size: 15px; color: #333; line-height: 1.5; white-space: pre-wrap;}
@@ -117,26 +117,21 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        const allowedEmails = ['admin@dheeb.com', 'wesam@dheeb.com']; 
+        // ⚠️ تم إزالة إيميل وسام من هنا
+        const allowedEmails = ['admin@dheeb.com']; 
         
         let isSuperAdmin = false; 
-        let isPartner = false; 
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 if (allowedEmails.includes(user.email)) {
                     document.getElementById('tweetSection').style.display = 'block';
-                    document.getElementById('exchangeRateSection').style.display = 'block'; // إظهار خانة السعر
-                    loadCurrentRate(); // جلب السعر الحالي
+                    document.getElementById('exchangeRateSection').style.display = 'block';
+                    loadCurrentRate();
                     
                     if (user.email === 'admin@dheeb.com') {
                         document.getElementById('adminNameDisplay').innerText = "شهاب الحمدان";
                         isSuperAdmin = true; 
-                        isPartner = false;
-                    } else if (user.email === 'wesam@dheeb.com') {
-                        document.getElementById('adminNameDisplay').innerText = "وسام ذيب"; 
-                        isSuperAdmin = false; 
-                        isPartner = true;
                     }
                     loadTweets(); 
                 } else {
@@ -221,6 +216,19 @@
             }
         }
 
+        // دالة حذف التغريدة يدوياً
+        window.deleteTweet = async function(tweetId) {
+            if(confirm('هل أنت متأكد من حذف هذه التغريدة؟')) {
+                try {
+                    await deleteDoc(doc(db, "announcements", tweetId));
+                    alert('تم حذف التغريدة بنجاح!');
+                    loadTweets(); 
+                } catch (error) {
+                    alert('حدث خطأ أثناء الحذف: ' + error.message);
+                }
+            }
+        }
+
         async function loadTweets() {
             const feed = document.getElementById('tweetFeed');
             if(!feed) return;
@@ -232,8 +240,23 @@
                     feed.innerHTML = '<p class="empty-msg">لا يوجد تغريدات منشورة بعد.</p>';
                     return;
                 }
-                querySnapshot.forEach((doc) => {
-                    const tweet = doc.data();
+                
+                querySnapshot.forEach(async (docSnap) => {
+                    const tweet = docSnap.data();
+                    
+                    // --- فحص الحذف التلقائي بعد 24 ساعة ---
+                    if (tweet.createdAt) {
+                        const now = new Date();
+                        const tweetDate = tweet.createdAt.toDate();
+                        const diffInHours = (now - tweetDate) / (1000 * 60 * 60);
+                        
+                        if (diffInHours > 24) {
+                            await deleteDoc(doc(db, "announcements", docSnap.id));
+                            return; // تخطي هذه التغريدة
+                        }
+                    }
+                    // ----------------------------------------
+
                     const div = document.createElement('div');
                     div.className = 'tweet-card';
                     let dateStr = '';
@@ -250,6 +273,7 @@
                         <span class="tweet-role">${tweet.role}</span>
                         <div class="tweet-text">${tweet.text}</div>
                         <span class="tweet-date">${dateStr}</span>
+                        <button onclick="deleteTweet('${docSnap.id}')" style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: bold; margin-top: 10px; display: block;">حذف 🗑️</button>
                     `;
                     feed.appendChild(div);
                 });
@@ -340,26 +364,6 @@
                                 </div>
                             `;
                         }
-                    } else if (isPartner) {
-                        if (isTargetingSuperAdmin) {
-                            actionButtonsHTML = `<span class="protected-text">(محمي)</span>`;
-                        } else {
-                            if (customer.isVerified) {
-                                actionButtonsHTML = `
-                                    <div class="action-buttons">
-                                        <button class="btn btn-unverify" onclick="toggleVerify('${customerId}', false, '${isTargetingSuperAdmin}')">إلغاء التوثيق</button>
-                                        <button class="btn btn-delete" onclick="deleteCustomer('${customerId}', true, '${isTargetingSuperAdmin}')">حذف الحساب</button>
-                                    </div>
-                                `;
-                            } else {
-                                actionButtonsHTML = `
-                                    <div class="action-buttons">
-                                        <button class="btn btn-verify" onclick="toggleVerify('${customerId}', true, '${isTargetingSuperAdmin}')">توثيق الحساب</button>
-                                        <button class="btn btn-delete" onclick="deleteCustomer('${customerId}', false, '${isTargetingSuperAdmin}')">حذف الحساب</button>
-                                    </div>
-                                `;
-                            }
-                        }
                     }
 
                     const verificationBadge = customer.isVerified 
@@ -384,11 +388,7 @@
         }
 
         window.toggleVerify = async function(customerId, isVerified, isProtected) {
-            if (isPartner && isProtected === 'true') {
-                alert("عذراً، لا يمكنك تعديل توثيق هذا الحساب (محمي).");
-                return;
-            }
-            if (!isSuperAdmin && !isPartner) { alert("عذراً، لا تملك صلاحية."); return; }
+            if (!isSuperAdmin) { alert("عذراً، لا تملك صلاحية."); return; }
             
             const actionText = isVerified ? 'توثيق' : 'إلغاء توثيق';
             if(confirm(`هل أنت متأكد من ${actionText} هذا الزبون؟`)) {
@@ -401,11 +401,6 @@
         }
 
         window.deleteCustomer = async function(customerId, isVerified, isProtected) {
-            if (isPartner && isProtected === 'true') {
-                alert("عذراً، هذا الحساب محمي ولا يمكنك حذفه.");
-                return;
-            }
-
             if(confirm('هل أنت متأكد من حذف هذا الحساب نهائياً؟')) {
                 try {
                     await deleteDoc(doc(db, "customers", customerId));
