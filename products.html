@@ -76,51 +76,33 @@
         const PRODUCTS_PER_PAGE = 20; 
         let cart = JSON.parse(localStorage.getItem('cart')) || []; 
 
-        // --- مكتبة الصور الواقعية لكل قسم ---
-        // تم استخدام روابط صور واقعية عالية الدقة
+        // --- مكتبة الصور الواقعية (روابط مباشرة مضمونة) ---
         const categoryImages = {
-            'حبوب وبقوليات': 'https://images.unsplash.com/photo-1586201375761-83865001e31c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80', // حبوب
-            'معلبات': 'https://images.unsplash.com/photo-1605807646983-377bc5a76493?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80', // معلبات
-            'مونة': 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80', // زيتون/مونة
-            'حلويات ومونة': 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80', // عسل وحلويات
-            'بسكويت وسناكس': 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80', // بسكويت
-            'ألبان وأجبان': 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80', // أجبان
-            'مشروبات ساخنة': 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80', // شاي/قهوة
-            'منظفات': 'https://images.unsplash.com/photo-1583947215259-38e31be8751f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80', // منظفات
-            'بهارات ومكسرات': 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80', // بهارات
-            'أخرى': 'https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' // سوبرماركت (للمنتجات غير المصنفة)
+            'معلبات': 'https://images.pexels.com/photos/4198022/pexels-photo-4198022.jpeg?auto=compress&cs=tinysrgb&w=400',
+            'مونة': 'https://images.pexels.com/photos/33783/olive-oil-salad-dressing-cooking-olive.jpg?auto=compress&cs=tinysrgb&w=400',
+            'حلويات ومونة': 'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg?auto=compress&cs=tinysrgb&w=400',
+            'بسكويت وسناكس': 'https://images.pexels.com/photos/230325/pexels-photo-230325.jpeg?auto=compress&cs=tinysrgb&w=400',
+            'ألبان وأجبان': 'https://images.pexels.com/photos/821365/pexels-photo-821365.jpeg?auto=compress&cs=tinysrgb&w=400',
+            'مشروبات ساخنة': 'https://images.pexels.com/photos/312418/pexels-photo-312418.jpeg?auto=compress&cs=tinysrgb&w=400',
+            'حبوب وبقوليات': 'https://images.pexels.com/photos/1537169/pexels-photo-1537169.jpeg?auto=compress&cs=tinysrgb&w=400',
+            'منظفات': 'https://images.pexels.com/photos/4239146/pexels-photo-4239146.jpeg?auto=compress&cs=tinysrgb&w=400',
+            'بهارات ومكسرات': 'https://images.pexels.com/photos/1340116/pexels-photo-1340116.jpeg?auto=compress&cs=tinysrgb&w=400',
+            'أخرى': 'https://images.pexels.com/photos/1005638/pexels-photo-1005638.jpeg?auto=compress&cs=tinysrgb&w=400'
         };
 
-        // --- دالة التصنيف الذكي بناءً على الكلمات المفتاحية ---
+        // --- دالة التصنيف المكثفة ---
         function determineCategory(productName) {
             const name = productName.toLowerCase();
             
-            // المشروبات الساخنة
-            if (name.includes('شاي') || name.includes('نسكافيه') || name.includes('قهوة') || name.includes('بن ') || name.includes('كابتشينو') || name.includes('هوت شوكلت') || name.includes('كافيه') || name.includes('ماتينال')) return 'مشروبات ساخنة';
-            
-            // المعلبات
-            if (name.includes('طون') || name.includes('تونة') || name.includes('سردين') || name.includes('فول') || name.includes('حمص') || name.includes('ذرة') || name.includes('بازيلا') || name.includes('فطر') || name.includes('معلب')) return 'معلبات';
-            
-            // المونة
-            if (name.includes('زيتون') || name.includes('مكدوس') || name.includes('خل') || name.includes('رب') || name.includes('دبس') || name.includes('مخلل') || name.includes('زيت') || name.includes('طحينة')) return 'مونة';
-            
-            // الحلويات والمونة
-            if (name.includes('حلاوة') || name.includes('عسل') || name.includes('مربى') || name.includes('تمر') || name.includes('قمر الدين') || name.includes('راحة')) return 'حلويات ومونة';
-            
-            // البسكويت والسناكس
-            if (name.includes('بسكويت') || name.includes('بسكوت') || name.includes('شوكولا') || name.includes('شوكو') || name.includes('كيك') || name.includes('شيبس') || name.includes('جيلي') || name.includes('مارشميلو') || name.includes('مصاص') || name.includes('علكة')) return 'بسكويت وسناكس';
-            
-            // الألبان والأجبان
-            if (name.includes('جبنة') || name.includes('لبن') || name.includes('لبنة') || name.includes('زبدة') || name.includes('قشطة') || name.includes('سمن') || name.includes('حليب')) return 'ألبان وأجبان';
-            
-            // الحبوب والبقوليات
-            if (name.includes('رز') || name.includes('برغل') || name.includes('عدس') || name.includes('فريكة') || name.includes('طحين') || name.includes('سكر') || name.includes('سميد') || name.includes('معكرونة') || name.includes('سباغيتي')) return 'حبوب وبقوليات';
-            
-            // المنظفات
-            if (name.includes('صابون') || name.includes('شامبو') || name.includes('مسحوق') || name.includes('كلور') || name.includes('منظف') || name.includes('معطر') || name.includes('جلي') || name.includes('ديتول')) return 'منظفات';
-            
-            // البهارات والمكسرات
-            if (name.includes('زعتر') || name.includes('شطة') || name.includes('بهار') || name.includes('فلفل') || name.includes('قرفة') || name.includes('كمون') || name.includes('مكسرات') || name.includes('لوز') || name.includes('فستق') || name.includes('كاجو')) return 'بهارات ومكسرات';
+            if (name.includes('شاي') || name.includes('نسكافيه') || name.includes('قهوة') || name.includes('بن ') || name.includes('كابتشينو') || name.includes('كافيه') || name.includes('ماتينال') || name.includes('نسلة') || name.includes('هوت شوكلت')) return 'مشروبات ساخنة';
+            if (name.includes('طون') || name.includes('تونة') || name.includes('سردين') || name.includes('فول') || name.includes('حمص') || name.includes('ذرة') || name.includes('بازيلا') || name.includes('فطر') || name.includes('معلب') || name.includes('ماكاديميا')) return 'معلبات';
+            if (name.includes('زيتون') || name.includes('مكدوس') || name.includes('خل') || name.includes('رب') || name.includes('دبس') || name.includes('مخلل') || name.includes('زيت') || name.includes('طحينة') || name.includes('حامض') || name.includes('مخلل')) return 'مونة';
+            if (name.includes('حلاوة') || name.includes('عسل') || name.includes('مربى') || name.includes('تمر') || name.includes('قمر الدين') || name.includes('راحة') || name.includes('دبس') || name.includes('طينة')) return 'حلويات ومونة';
+            if (name.includes('بسكويت') || name.includes('بسكوت') || name.includes('شوكولا') || name.includes('شوكو') || name.includes('كيك') || name.includes('شيبس') || name.includes('جيلي') || name.includes('مارشميلو') || name.includes('مصاص') || name.includes('علكة') || name.includes('كراكر') || name.includes('ويفر') || name.includes('كورن فليكس')) return 'بسكويت وسناكس';
+            if (name.includes('جبنة') || name.includes('لبن') || name.includes('لبنة') || name.includes('زبدة') || name.includes('قشطة') || name.includes('سمن') || name.includes('حليب') || name.includes('قشقوان')) return 'ألبان وأجبان';
+            if (name.includes('رز') || name.includes('برغل') || name.includes('عدس') || name.includes('فريكة') || name.includes('طحين') || name.includes('سكر') || name.includes('سميد') || name.includes('معكرونة') || name.includes('سباغيتي') || name.includes('مغربية') || name.includes('كسكسة') || name.includes('قمح') || name.includes('شعيرية')) return 'حبوب وبقوليات';
+            if (name.includes('صابون') || name.includes('شامبو') || name.includes('مسحوق') || name.includes('كلور') || name.includes('منظف') || name.includes('معطر') || name.includes('جلي') || name.includes('ديتول') || name.includes('محارم') || name.includes('فاين')) return 'منظفات';
+            if (name.includes('زعتر') || name.includes('شطة') || name.includes('بهار') || name.includes('فلفل') || name.includes('قرفة') || name.includes('كمون') || name.includes('مكسرات') || name.includes('لوز') || name.includes('فستق') || name.includes('كاجو') || name.includes('سمسم') || name.includes('زنجبيل') || name.includes('حبة البركة')) return 'بهارات ومكسرات';
             
             return 'أخرى';
         }
@@ -134,10 +116,8 @@
         function addToCart(uniqueId, productName, btnElement) {
             const unitSelect = document.getElementById('unit-' + uniqueId);
             const quantityInput = document.getElementById('qty-' + uniqueId);
-            
             const selectedUnit = unitSelect ? unitSelect.value : 'قطعة';
             const quantity = quantityInput ? parseFloat(quantityInput.value) : 1;
-
             const existingItemIndex = cart.findIndex(item => item.name === productName && item.unit === selectedUnit);
 
             if (existingItemIndex !== -1) {
@@ -162,14 +142,12 @@
             const uniqueId = product.name.replace(/\s/g, '-'); 
             const card = document.createElement('div');
             card.className = 'product-card';
-            
             const imageUrl = categoryImages[product.category] || categoryImages['أخرى'];
-
             const units = ['قطعة', 'كيلو', 'لتر', 'علبة', 'كيس'];
             let unitOptions = units.map(u => `<option value="${u}">${u}</option>`).join('');
 
             card.innerHTML = `
-                <img src="${imageUrl}" class="product-img" alt="${product.category}" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
+                <img src="${imageUrl}" class="product-img" alt="${product.category}" onerror="this.src='https://images.pexels.com/photos/1005638/pexels-photo-1005638.jpeg?auto=compress&cs=tinysrgb&w=400'">
                 <div class="product-name">${product.name}</div>
                 <div class="cart-controls">
                     <select id="unit-${uniqueId}" class="unit-selector">
@@ -185,13 +163,8 @@
         function renderNextBatch() {
             const grid = document.getElementById('productsGrid');
             const nextBatch = displayedProducts.slice(currentIndex, currentIndex + PRODUCTS_PER_PAGE);
-            
-            nextBatch.forEach(product => {
-                grid.appendChild(createProductCard(product));
-            });
-
+            nextBatch.forEach(product => { grid.appendChild(createProductCard(product)); });
             currentIndex += PRODUCTS_PER_PAGE;
-
             if (currentIndex >= displayedProducts.length) {
                 document.getElementById('loadMoreContainer').classList.add('hidden');
             } else {
@@ -209,9 +182,7 @@
                 document.getElementById('loadMoreContainer').classList.add('hidden');
                 return;
             }
-            productsToRender.forEach(product => {
-                grid.appendChild(createProductCard(product));
-            });
+            productsToRender.forEach(product => { grid.appendChild(createProductCard(product)); });
             document.getElementById('loadMoreContainer').classList.add('hidden');
         }
 
@@ -219,13 +190,7 @@
             document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
             btnElement.classList.add('active');
             document.getElementById('searchInput').value = ''; 
-
-            if (category === 'الكل') {
-                displayedProducts = allProducts;
-            } else {
-                displayedProducts = allProducts.filter(p => p.category === category);
-            }
-            
+            displayedProducts = (category === 'الكل') ? allProducts : allProducts.filter(p => p.category === category);
             document.getElementById('productsGrid').innerHTML = '';
             currentIndex = 0;
             renderNextBatch();
@@ -242,10 +207,7 @@
                 allProducts = rows.slice(1).map(row => {
                     const cols = row.split(',');
                     let name = cols.length >= 3 ? cols[2].trim() : row.trim();
-                    return {
-                        name: name,
-                        category: determineCategory(name)
-                    };
+                    return { name: name, category: determineCategory(name) };
                 }).filter(p => p.name !== '' && p.name !== 'الاسم' && p.name !== 'غذائيات');
 
                 const uniqueCategories = ['الكل', ...new Set(allProducts.map(p => p.category))];
@@ -270,7 +232,6 @@
 
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const searchTerm = e.target.value.trim().toLowerCase();
-            
             document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
             const allBtn = document.querySelector('.category-btn');
             if(allBtn) allBtn.classList.add('active');
