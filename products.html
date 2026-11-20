@@ -19,6 +19,7 @@
         
         .product-card { position: relative; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px 15px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; border-top: 4px solid #4a1118; }
         
+        /* زر التعديل (بيظهر بس للأدمن الرئيسي) */
         .edit-img-btn { display: none; position: absolute; top: 10px; left: 10px; background-color: #c9a45c; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 14px; z-index: 10;}
         .admin-mode .edit-img-btn { display: block !important; } 
 
@@ -105,7 +106,7 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // ✅ تم وضع مفتاح API الخاص بك هنا
+        // ✅ مفتاح API الخاص بك
         const IMGBB_API_KEY = "6d23416befb7bae71648bf72fcbfea8b"; 
 
         let allProducts = []; 
@@ -117,8 +118,9 @@
         let isAdmin = false;
         let selectedProductForImage = "";
 
+        // ✅ التحقق من الصلاحيات: شهاب فقط هو اللي يقدر يرفع صور
         onAuthStateChanged(auth, (user) => {
-            if (user && (user.email === 'admin@dheeb.com' || user.email === 'wesam@dheeb.com')) {
+            if (user && user.email === 'admin@dheeb.com') {
                 isAdmin = true;
                 document.body.classList.add('admin-mode');
                 if(allProducts.length > 0) {
