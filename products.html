@@ -114,7 +114,7 @@
         let isAdmin = false;
         let selectedProductForImage = "";
 
-        // ✅ شهاب فقط هو اللي يقدر يرفع صور المنتجات
+        // ✅ شهاب فقط يرفع صور المنتجات
         onAuthStateChanged(auth, (user) => {
             if (user && user.email === 'admin@dheeb.com') {
                 isAdmin = true;
@@ -211,8 +211,11 @@
         }
         updateCartCount(); 
 
-        // ✅ الحل: الدالة متاحة للـ onclick بـ window
-        window.addToCart = function(uniqueId, productName, btnElement) {
+        // ✅ الحل: استخدام data attributes بدل تمرير الاسم في onclick
+        window.addToCart = function(btnElement) {
+            const uniqueId = btnElement.getAttribute('data-uid');
+            const productName = btnElement.getAttribute('data-name');
+            
             const unitSelect = document.getElementById('unit-' + uniqueId);
             const quantityInput = document.getElementById('qty-' + uniqueId);
             const selectedUnit = unitSelect ? unitSelect.value : 'قطعة';
@@ -240,8 +243,8 @@
             }, 1000);
         };
 
-        function createProductCard(product) {
-            const uniqueId = product.name.replace(/\s/g, '-').replace(/[^\w\u0600-\u06FF-]/g, ''); 
+        function createProductCard(product, index) {
+            const uniqueId = 'p' + index; 
             const card = document.createElement('div');
             card.className = 'product-card';
             
@@ -261,7 +264,7 @@
                 <div class="cart-controls">
                     <select id="unit-${uniqueId}" class="unit-selector">${unitOptions}</select>
                     <input type="number" id="qty-${uniqueId}" value="1" min="0.1" step="0.1" class="qty-input" placeholder="الكمية">
-                    <button class="add-btn" onclick="addToCart('${uniqueId}', '${product.name.replace(/'/g, "\\'")}', this)">إضافة للسلة</button>
+                    <button class="add-btn" data-uid="${uniqueId}" data-name="${product.name.replace(/"/g, '&quot;')}" onclick="addToCart(this)">إضافة للسلة</button>
                 </div>
             `;
             return card;
@@ -270,7 +273,9 @@
         function renderNextBatch() {
             const grid = document.getElementById('productsGrid');
             const nextBatch = displayedProducts.slice(currentIndex, currentIndex + PRODUCTS_PER_PAGE);
-            nextBatch.forEach(product => { grid.appendChild(createProductCard(product)); });
+            nextBatch.forEach((product, i) => { 
+                grid.appendChild(createProductCard(product, currentIndex + i)); 
+            });
             currentIndex += PRODUCTS_PER_PAGE;
             if (currentIndex >= displayedProducts.length) { document.getElementById('loadMoreContainer').classList.add('hidden'); } else { document.getElementById('loadMoreContainer').classList.remove('hidden'); }
         }
@@ -281,7 +286,7 @@
             const grid = document.getElementById('productsGrid');
             grid.innerHTML = ''; 
             if (productsToRender.length === 0) { grid.innerHTML = '<p style="text-align:center; grid-column: 1/-1; font-size: 18px; color: #777;">لا يوجد منتجات مطابقة للبحث</p>'; document.getElementById('loadMoreContainer').classList.add('hidden'); return; }
-            productsToRender.forEach(product => { grid.appendChild(createProductCard(product)); });
+            productsToRender.forEach((product, i) => { grid.appendChild(createProductCard(product, i)); });
             document.getElementById('loadMoreContainer').classList.add('hidden');
         }
 
