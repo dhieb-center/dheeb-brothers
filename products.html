@@ -14,12 +14,12 @@
 
         .search-box { width: 100%; padding: 15px; margin-bottom: 15px; border: 2px solid #c9a45c; border-radius: 8px; font-family: 'Cairo', sans-serif; font-size: 16px; box-sizing: border-box; }
 
-        /* Categories Bar */
+        /* أزرار التصنيفات */
         .categories-bar { display: flex; overflow-x: auto; gap: 10px; margin-bottom: 10px; padding-bottom: 10px; }
         .category-btn { background-color: white; color: #4a1118; border: 2px solid #c9a45c; padding: 8px 20px; border-radius: 50px; font-family: 'Cairo', sans-serif; font-weight: bold; cursor: pointer; white-space: nowrap; transition: 0.3s; }
         .category-btn.active { background-color: #4a1118; color: #c9a45c; border-color: #4a1118; }
 
-        /* Companies Bar (الشركات) */
+        /* أزرار الشركات */
         .companies-bar { display: flex; overflow-x: auto; gap: 10px; margin-bottom: 20px; padding-bottom: 10px; border-top: 1px dashed #ccc; padding-top: 10px;}
         .company-btn { background-color: #f4f6f9; color: #4a1118; border: 1px solid #ccc; padding: 5px 15px; border-radius: 5px; font-family: 'Cairo', sans-serif; font-size: 13px; cursor: pointer; }
         .company-btn.active { background-color: #c9a45c; color: white; border-color: #c9a45c; }
@@ -27,8 +27,11 @@
         .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         @media(min-width: 768px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
 
-        /* Product Card بدون صور */
+        /* كارت المنتج مع صورة تعبيرية */
         .product-card { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 15px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; border-top: 3px solid #4a1118; }
+        
+        /* الصورة التعبيرية */
+        .product-icon { width: 60px; height: 60px; margin: 0 auto 10px auto; object-fit: contain; opacity: 0.8; }
         
         .product-name { font-weight: 700; color: #4a1118; font-size: 16px; flex-grow: 1; display: flex; align-items: center; justify-content: center; line-height: 1.4; margin-bottom: 15px; min-height: 40px;}
         
@@ -57,10 +60,7 @@
 
     <input type="text" id="searchInput" class="search-box" placeholder="ابحث عن منتج... (اكتب اسم المنتج)">
 
-    <!-- أزرار أنواع المنتجات (غذائيات، منظفات، إلخ) -->
     <div class="categories-bar" id="categoriesBar"></div>
-    
-    <!-- أزرار الشركات (هشام، نورا، إلخ) -->
     <div class="companies-bar" id="companiesBar"></div>
 
     <div id="loading" class="loading">جاري تحميل المنتجات... ⏳</div>
@@ -82,45 +82,26 @@
         const PRODUCTS_PER_PAGE = 20; 
         let cart = JSON.parse(localStorage.getItem('cart')) || []; 
 
-        // قائمة الكلمات المفتاحية للتصنيف التلقائي (تقدر تعدلها زي ما بدك)
-        const categoryKeywords = {
-            'غذائيات': ['زيت', 'سكر', 'رز', 'أرز', 'طحين', 'عدس', 'فول', 'حمص', 'برغل', 'شاي', 'قهوة', 'مكرونة', 'ملح', 'بهار'],
-            'معلبات': ['تونة', 'معلب', 'صلصة', 'فطر', 'زيتون', 'مخلل'],
-            'منظفات': ['منظف', 'صابون', 'جلي', 'كلور', 'معطر', 'مسحوق', 'غسيل', 'شامبو'],
-            'ألبان': ['جبنة', 'لبن', 'لبنة', 'قشطة', 'زبدة', 'حليب'],
-            'بسكويت وسناكس': ['بسكويت', 'شيبس', 'شوكولا', 'كيك', 'سناكس', 'علكة', 'مصاص']
+        // --- مكتبة الصور التعبيرية لكل قسم ---
+        // تأكد إن اسم القسم في ملف الـ CSV مطابق تماماً للاسم هون
+        const categoryIcons = {
+            'حبوب': 'https://cdn-icons-png.flaticon.com/512/3081/3081847.png',
+            'بقوليات': 'https://cdn-icons-png.flaticon.com/512/2674/2674516.png',
+            'خضروات': 'https://cdn-icons-png.flaticon.com/512/2940/2940133.png',
+            'فواكه': 'https://cdn-icons-png.flaticon.com/512/3150/3150442.png',
+            'ألبان': 'https://cdn-icons-png.flaticon.com/512/3081/3081847.png',
+            'معلبات': 'https://cdn-icons-png.flaticon.com/512/2674/2674516.png',
+            'مكسرات': 'https://cdn-icons-png.flaticon.com/512/2940/2940133.png',
+            'بهارات': 'https://cdn-icons-png.flaticon.com/512/3150/3150442.png',
+            'بسكويت وسناكس': 'https://cdn-icons-png.flaticon.com/512/2553/2553642.png',
+            'شوكولا وحلويات': 'https://cdn-icons-png.flaticon.com/512/3081/3081847.png',
+            'مشروبات': 'https://cdn-icons-png.flaticon.com/512/2674/2674516.png',
+            'منظفات': 'https://cdn-icons-png.flaticon.com/512/2940/2940133.png',
+            'كلور': 'https://cdn-icons-png.flaticon.com/512/3150/3150442.png',
+            'شامبو': 'https://cdn-icons-png.flaticon.com/512/3081/3081847.png',
+            'أدوات منزلية': 'https://cdn-icons-png.flaticon.com/512/2553/2553642.png',
+            'أخرى': 'https://cdn-icons-png.flaticon.com/512/679/679720.png' 
         };
-
-        // قائمة الشركات (تقدر تعدلها وتضيف أسماء شركاتك)
-        const companyKeywords = {
-            'سيدي هشام': ['هشام', 'سيدي هشام'],
-            'نورا': ['نورا'],
-            'الغزال': ['غزال', 'الغزال'],
-            'أخرى': [] // أي منتج ما بينتمي لشركة معروفة
-        };
-
-        // دالة تحديد القسم تلقائياً بناءً على الاسم
-        function determineCategory(productName) {
-            const name = productName.toLowerCase();
-            for (const [category, keywords] of Object.entries(categoryKeywords)) {
-                if (keywords.some(keyword => name.includes(keyword.toLowerCase()))) {
-                    return category;
-                }
-            }
-            return 'أخرى'; // إذا ما لقى كلمات مفتاحية
-        }
-
-        // دالة تحديد الشركة تلقائياً بناءً على الاسم
-        function determineCompany(productName) {
-            const name = productName.toLowerCase();
-            for (const [company, keywords] of Object.entries(companyKeywords)) {
-                if (company === 'أخرى') continue; 
-                if (keywords.some(keyword => name.includes(keyword.toLowerCase()))) {
-                    return company;
-                }
-            }
-            return 'أخرى';
-        }
 
         function updateCartCount() {
             let total = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -158,151 +139,3 @@
         function createProductCard(product) {
             const uniqueId = product.name.replace(/\s/g, '-'); 
             const card = document.createElement('div');
-            card.className = 'product-card';
-            
-            const units = ['قطعة', 'كيلو', 'لتر', 'علبة', 'كيس'];
-            let unitOptions = units.map(u => `<option value="${u}">${u}</option>`).join('');
-
-            card.innerHTML = `
-                <div class="product-name">${product.name}</div>
-                <div class="cart-controls">
-                    <select id="unit-${uniqueId}" class="unit-selector">
-                        ${unitOptions}
-                    </select>
-                    <input type="number" id="qty-${uniqueId}" value="1" min="0.1" step="0.1" class="qty-input" placeholder="الكمية">
-                    <button class="add-btn" onclick="addToCart('${uniqueId}', '${product.name}', this)">إضافة للسلة</button>
-                </div>
-            `;
-            return card;
-        }
-
-        function renderNextBatch() {
-            const grid = document.getElementById('productsGrid');
-            const nextBatch = displayedProducts.slice(currentIndex, currentIndex + PRODUCTS_PER_PAGE);
-            
-            nextBatch.forEach(product => {
-                grid.appendChild(createProductCard(product));
-            });
-
-            currentIndex += PRODUCTS_PER_PAGE;
-
-            if (currentIndex >= displayedProducts.length) {
-                document.getElementById('loadMoreContainer').classList.add('hidden');
-            } else {
-                document.getElementById('loadMoreContainer').classList.remove('hidden');
-            }
-        }
-
-        function loadMoreProducts() { renderNextBatch(); }
-
-        function renderSearchResults(productsToRender) {
-            const grid = document.getElementById('productsGrid');
-            grid.innerHTML = ''; 
-            if (productsToRender.length === 0) {
-                grid.innerHTML = '<p style="text-align:center; grid-column: 1/-1; font-size: 18px; color: #777;">لا يوجد منتجات مطابقة للبحث</p>';
-                document.getElementById('loadMoreContainer').classList.add('hidden');
-                return;
-            }
-            productsToRender.forEach(product => {
-                grid.appendChild(createProductCard(product));
-            });
-            document.getElementById('loadMoreContainer').classList.add('hidden');
-        }
-
-        function filterProducts(category, company, catBtn, compBtn) {
-            // تحديث شكل الأزرار
-            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-            if (catBtn) catBtn.classList.add('active');
-            
-            document.querySelectorAll('.company-btn').forEach(btn => btn.classList.remove('active'));
-            if (compBtn) compBtn.classList.add('active');
-            
-            document.getElementById('searchInput').value = ''; 
-
-            // الفلترة
-            displayedProducts = allProducts.filter(p => {
-                const catMatch = (category === 'الكل' || p.category === category);
-                const compMatch = (company === 'الكل' || p.company === company);
-                return catMatch && compMatch;
-            });
-            
-            document.getElementById('productsGrid').innerHTML = '';
-            currentIndex = 0;
-            renderNextBatch();
-        }
-
-        async function loadProducts() {
-            try {
-                const response = await fetch('products.csv');
-                if (!response.ok) throw new Error("File not found");
-                const data = await response.text();
-                const rows = data.split('\n').filter(row => row.trim() !== '');
-                document.getElementById('loading').style.display = 'none';
-
-                // قراءة الملف (الاسم فقط، وتصنيفه تلقائياً)
-                allProducts = rows.slice(1).map(row => {
-                    const name = row.trim();
-                    return {
-                        name: name,
-                        category: determineCategory(name),
-                        company: determineCompany(name)
-                    };
-                }).filter(p => p.name !== '');
-
-                // بناء أزرار الأقسام
-                const uniqueCategories = ['الكل', ...new Set(allProducts.map(p => p.category))];
-                const catBar = document.getElementById('categoriesBar');
-                catBar.innerHTML = '';
-                uniqueCategories.forEach(cat => {
-                    const btn = document.createElement('button');
-                    btn.className = cat === 'الكل' ? 'category-btn active' : 'category-btn';
-                    btn.innerText = cat;
-                    btn.onclick = () => filterProducts(cat, 'الكل', btn, null);
-                    catBar.appendChild(btn);
-                });
-
-                // بناء أزرار الشركات
-                const uniqueCompanies = ['الكل', ...new Set(allProducts.map(p => p.company))].filter(c => c !== 'أخرى'); // إخفاء "أخرى" إذا ما في منتجات
-                const compBar = document.getElementById('companiesBar');
-                compBar.innerHTML = '';
-                uniqueCompanies.forEach(comp => {
-                    const btn = document.createElement('button');
-                    btn.className = comp === 'الكل' ? 'company-btn active' : 'company-btn';
-                    btn.innerText = comp;
-                    btn.onclick = () => filterProducts('الكل', comp, null, btn);
-                    compBar.appendChild(btn);
-                });
-
-                displayedProducts = allProducts;
-                renderNextBatch();
-
-            } catch (error) {
-                document.getElementById('loading').innerText = "حدث خطأ في تحميل ملف المنتجات. تأكد من وجود ملف products.csv بجانب هذا الملف.";
-                console.error(error);
-            }
-        }
-
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.trim().toLowerCase();
-            
-            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.company-btn').forEach(btn => btn.classList.remove('active'));
-            const allCatBtn = document.querySelector('.category-btn');
-            if(allCatBtn) allCatBtn.classList.add('active');
-
-            if (searchTerm === '') {
-                displayedProducts = allProducts;
-                document.getElementById('productsGrid').innerHTML = '';
-                currentIndex = 0;
-                renderNextBatch();
-            } else {
-                const filtered = allProducts.filter(p => p.name.toLowerCase().includes(searchTerm));
-                renderSearchResults(filtered);
-            }
-        });
-
-        loadProducts();
-    </script>
-
-</body>
-</html>
