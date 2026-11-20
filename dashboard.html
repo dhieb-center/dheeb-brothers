@@ -8,14 +8,13 @@
     <style>
         body { background-color: #f4f6f9; font-family: 'Cairo', sans-serif; margin: 0; padding: 20px; }
         
-        /* تعديل الهيدر ليكون مرتب على الموبايل */
         .header { 
             background-color: #4a1118; 
             color: white; 
             padding: 15px; 
             border-radius: 10px; 
             display: flex; 
-            flex-direction: column; /* يخلي العناصر تحت بعضها */
+            flex-direction: column; 
             justify-content: center; 
             align-items: center; 
             border-bottom: 4px solid #c9a45c; 
@@ -39,13 +38,13 @@
             gap: 10px;
             width: 100%;
             justify-content: center;
-            flex-wrap: wrap; /* عشان الأزرار ما تطلع برا الشاشة */
+            flex-wrap: wrap; 
         }
 
         .badge { width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; }
         .badge svg { width: 100%; height: 100%; }
-        .badge-blue { fill: #1877F2; }
-        .badge-green { fill: #28a745; }
+        .badge-blue { fill: #1877F2; } 
+        .badge-green { fill: #28a745; } 
         
         .logout-btn { background-color: transparent; color: #c9a45c; border: 1px solid #c9a45c; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: bold; transition: 0.3s; font-size: 14px; }
         .logout-btn:hover { background-color: #c9a45c; color: #4a1118; }
@@ -159,7 +158,8 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        const allowedEmails = ['admin@dheeb.com', 'wesam@dheeb.com']; 
+        // ✅ الإيميلات المسموح لها بالدخول للوحة التحكم
+        const allowedEmails = ['admin@dheeb.com', 'wesam@dheeb.com', 'hatem@dheeb.com']; 
         let isSuperAdmin = false; 
 
         onAuthStateChanged(auth, (user) => {
@@ -169,11 +169,15 @@
                     document.getElementById('exchangeRateSection').style.display = 'block';
                     loadCurrentRate();
                     
+                    // ✅ الأسماء والصلاحيات
                     if (user.email === 'admin@dheeb.com') {
                         document.getElementById('adminNameDisplay').innerText = "شهاب الحمدان";
                         isSuperAdmin = true; 
                     } else if (user.email === 'wesam@dheeb.com') {
                         document.getElementById('adminNameDisplay').innerText = "وسام ذيب"; 
+                        isSuperAdmin = false; 
+                    } else if (user.email === 'hatem@dheeb.com') {
+                        document.getElementById('adminNameDisplay').innerText = "حاتم ذيب (صاحب المركز)";
                         isSuperAdmin = false; 
                     }
                     loadTweets(); 
@@ -325,16 +329,65 @@
                     const div = document.createElement('div');
                     div.className = 'customer-item';
                     let actionButtonsHTML = '';
+                    
+                    // حماية حساب شهاب الحمدان من الحذف
                     const isTargetingSuperAdmin = (customer.fullName === 'شهاب الحمدان' || customer.email === 'admin@dheeb.com');
+                    // حماية حسابات الإداريين (وسام وحاتم) من الحذف من قبل بعضهم
+                    const isTargetingAdmin = (customer.email === 'wesam@dheeb.com' || customer.email === 'hatem@dheeb.com');
+
+                    // إذا كان المستخدم الحالي هو شهاب (المدير العام)
                     if (isSuperAdmin) {
                         if (customer.isVerified) {
-                            actionButtonsHTML = `<div class="action-buttons"><button class="btn btn-unverify" onclick="toggleVerify('${customerId}', false, '${isTargetingSuperAdmin}')">إلغاء التوثيق</button><button class="btn btn-delete" onclick="deleteCustomer('${customerId}', true, '${isTargetingSuperAdmin}')">حذف الحساب</button></div>`;
+                            actionButtonsHTML = `
+                                <div class="action-buttons">
+                                    <button class="btn btn-unverify" onclick="toggleVerify('${customerId}', false, '${isTargetingSuperAdmin}')">إلغاء التوثيق</button>
+                                    ${!isTargetingSuperAdmin ? `<button class="btn btn-delete" onclick="deleteCustomer('${customerId}', true, '${isTargetingSuperAdmin}')">حذف الحساب</button>` : ''}
+                                </div>
+                            `;
                         } else {
-                            actionButtonsHTML = `<div class="action-buttons"><button class="btn btn-verify" onclick="toggleVerify('${customerId}', true, '${isTargetingSuperAdmin}')">توثيق الحساب</button><button class="btn btn-delete" onclick="deleteCustomer('${customerId}', false, '${isTargetingSuperAdmin}')">حذف الحساب</button></div>`;
+                            actionButtonsHTML = `
+                                <div class="action-buttons">
+                                    <button class="btn btn-verify" onclick="toggleVerify('${customerId}', true, '${isTargetingSuperAdmin}')">توثيق الحساب</button>
+                                    ${!isTargetingSuperAdmin ? `<button class="btn btn-delete" onclick="deleteCustomer('${customerId}', false, '${isTargetingSuperAdmin}')">حذف الحساب</button>` : ''}
+                                </div>
+                            `;
+                        }
+                    } 
+                    // إذا كان المستخدم الحالي هو وسام أو حاتم (شريك)
+                    else {
+                        // إذا كان الحساب المستهدف هو شهاب أو إداري آخر، ما بيقدر يحذفه
+                        if (isTargetingSuperAdmin || isTargetingAdmin) {
+                            actionButtonsHTML = `<span class="protected-text">(محمي)</span>`;
+                        } else {
+                            if (customer.isVerified) {
+                                actionButtonsHTML = `
+                                    <div class="action-buttons">
+                                        <button class="btn btn-unverify" onclick="toggleVerify('${customerId}', false, '${isTargetingSuperAdmin}')">إلغاء التوثيق</button>
+                                        <button class="btn btn-delete" onclick="deleteCustomer('${customerId}', true, '${isTargetingSuperAdmin}')">حذف الحساب</button>
+                                    </div>
+                                `;
+                            } else {
+                                actionButtonsHTML = `
+                                    <div class="action-buttons">
+                                        <button class="btn btn-verify" onclick="toggleVerify('${customerId}', true, '${isTargetingSuperAdmin}')">توثيق الحساب</button>
+                                        <button class="btn btn-delete" onclick="deleteCustomer('${customerId}', false, '${isTargetingSuperAdmin}')">حذف الحساب</button>
+                                    </div>
+                                `;
+                            }
                         }
                     }
-                    const verificationBadge = customer.isVerified ? `<span class="badge badge-green" title="زبون موثق"><svg viewBox="0 0 24 24"><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg></span>` : '';
-                    div.innerHTML = `<div class="customer-info"><span class="customer-name">${customer.fullName}${verificationBadge}</span><span class="customer-details">📞 ${customer.phone} | 🎂 ${customer.dob}</span></div><div>${actionButtonsHTML}</div>`;
+
+                    const verificationBadge = customer.isVerified 
+                        ? `<span class="badge badge-green" title="زبون موثق"><svg viewBox="0 0 24 24"><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg></span>` 
+                        : '';
+
+                    div.innerHTML = `
+                        <div class="customer-info">
+                            <span class="customer-name">${customer.fullName}${verificationBadge}</span>
+                            <span class="customer-details">📞 ${customer.phone} | 🎂 ${customer.dob}</span>
+                        </div>
+                        <div>${actionButtonsHTML}</div>
+                    `;
                     listContainer.appendChild(div);
                 });
                 checkBirthdays(customersArray);
@@ -342,7 +395,7 @@
         }
 
         window.toggleVerify = async function(customerId, isVerified, isProtected) {
-            if (!isSuperAdmin) { alert("عذراً، لا تملك صلاحية."); return; }
+            if (!isSuperAdmin) { alert("عذراً، لا تملك صلاحية توثيق أو إلغاء توثيق الحسابات."); return; }
             const actionText = isVerified ? 'توثيق' : 'إلغاء توثيق';
             if(confirm(`هل أنت متأكد من ${actionText} هذا الزبون؟`)) {
                 try {
@@ -354,6 +407,10 @@
         }
 
         window.deleteCustomer = async function(customerId, isVerified, isProtected) {
+            if (isProtected === 'true' || !isSuperAdmin) {
+                alert("عذراً، لا يمكنك حذف هذا الحساب (محمي).");
+                return;
+            }
             if(confirm('هل أنت متأكد من حذف هذا الحساب نهائياً؟')) {
                 try {
                     await deleteDoc(doc(db, "customers", customerId));
