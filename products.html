@@ -22,18 +22,15 @@
         .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         @media(min-width: 768px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
 
-        /* كارت المنتج */
-        .product-card { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 15px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; border-top: 3px solid #4a1118; }
+        /* كارت المنتج بدون صور */
+        .product-card { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px 15px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; border-top: 3px solid #4a1118; }
         
-        /* الصورة الواقعية */
-        .product-img { width: 100%; height: 120px; object-fit: cover; margin-bottom: 10px; border-radius: 8px; background: #f9f9f9;}
-        
-        .product-name { font-weight: 700; color: #4a1118; font-size: 16px; flex-grow: 1; display: flex; align-items: center; justify-content: center; line-height: 1.4; margin-bottom: 15px; min-height: 40px;}
+        .product-name { font-weight: 700; color: #4a1118; font-size: 18px; flex-grow: 1; display: flex; align-items: center; justify-content: center; line-height: 1.4; margin-bottom: 20px; min-height: 50px;}
         
         .cart-controls { display: flex; flex-direction: column; gap: 8px; }
         .unit-selector { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-family: 'Cairo', sans-serif; font-size: 14px; width: 100%; box-sizing: border-box; background-color: #fff; cursor: pointer; text-align: center; }
         .qty-input { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-family: 'Cairo', sans-serif; font-size: 14px; text-align: center; width: 100%; box-sizing: border-box; }
-        .add-btn { background-color: #c9a45c; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: bold; transition: 0.3s; font-size: 14px; }
+        .add-btn { background-color: #c9a45c; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: bold; transition: 0.3s; font-size: 15px; }
         .add-btn:hover { background-color: #b08d4a; }
         
         .load-more-container { text-align: center; margin-top: 30px; margin-bottom: 20px;}
@@ -76,28 +73,14 @@
         const PRODUCTS_PER_PAGE = 20; 
         let cart = JSON.parse(localStorage.getItem('cart')) || []; 
 
-        // --- مكتبة الصور الواقعية (روابط مباشرة مضمونة) ---
-        const categoryImages = {
-            'معلبات': 'https://images.pexels.com/photos/4198022/pexels-photo-4198022.jpeg?auto=compress&cs=tinysrgb&w=400',
-            'مونة': 'https://images.pexels.com/photos/33783/olive-oil-salad-dressing-cooking-olive.jpg?auto=compress&cs=tinysrgb&w=400',
-            'حلويات ومونة': 'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg?auto=compress&cs=tinysrgb&w=400',
-            'بسكويت وسناكس': 'https://images.pexels.com/photos/230325/pexels-photo-230325.jpeg?auto=compress&cs=tinysrgb&w=400',
-            'ألبان وأجبان': 'https://images.pexels.com/photos/821365/pexels-photo-821365.jpeg?auto=compress&cs=tinysrgb&w=400',
-            'مشروبات ساخنة': 'https://images.pexels.com/photos/312418/pexels-photo-312418.jpeg?auto=compress&cs=tinysrgb&w=400',
-            'حبوب وبقوليات': 'https://images.pexels.com/photos/1537169/pexels-photo-1537169.jpeg?auto=compress&cs=tinysrgb&w=400',
-            'منظفات': 'https://images.pexels.com/photos/4239146/pexels-photo-4239146.jpeg?auto=compress&cs=tinysrgb&w=400',
-            'بهارات ومكسرات': 'https://images.pexels.com/photos/1340116/pexels-photo-1340116.jpeg?auto=compress&cs=tinysrgb&w=400',
-            'أخرى': 'https://images.pexels.com/photos/1005638/pexels-photo-1005638.jpeg?auto=compress&cs=tinysrgb&w=400'
-        };
-
-        // --- دالة التصنيف المكثفة ---
+        // --- دالة التصنيف الذكي بناءً على الكلمات المفتاحية ---
         function determineCategory(productName) {
             const name = productName.toLowerCase();
             
             if (name.includes('شاي') || name.includes('نسكافيه') || name.includes('قهوة') || name.includes('بن ') || name.includes('كابتشينو') || name.includes('كافيه') || name.includes('ماتينال') || name.includes('نسلة') || name.includes('هوت شوكلت')) return 'مشروبات ساخنة';
             if (name.includes('طون') || name.includes('تونة') || name.includes('سردين') || name.includes('فول') || name.includes('حمص') || name.includes('ذرة') || name.includes('بازيلا') || name.includes('فطر') || name.includes('معلب') || name.includes('ماكاديميا')) return 'معلبات';
-            if (name.includes('زيتون') || name.includes('مكدوس') || name.includes('خل') || name.includes('رب') || name.includes('دبس') || name.includes('مخلل') || name.includes('زيت') || name.includes('طحينة') || name.includes('حامض') || name.includes('مخلل')) return 'مونة';
-            if (name.includes('حلاوة') || name.includes('عسل') || name.includes('مربى') || name.includes('تمر') || name.includes('قمر الدين') || name.includes('راحة') || name.includes('دبس') || name.includes('طينة')) return 'حلويات ومونة';
+            if (name.includes('زيتون') || name.includes('مكدوس') || name.includes('خل') || name.includes('رب') || name.includes('دبس') || name.includes('مخلل') || name.includes('زيت') || name.includes('طحينة') || name.includes('حامض')) return 'مونة';
+            if (name.includes('حلاوة') || name.includes('عسل') || name.includes('مربى') || name.includes('تمر') || name.includes('قمر الدين') || name.includes('راحة') || name.includes('طينة')) return 'حلويات ومونة';
             if (name.includes('بسكويت') || name.includes('بسكوت') || name.includes('شوكولا') || name.includes('شوكو') || name.includes('كيك') || name.includes('شيبس') || name.includes('جيلي') || name.includes('مارشميلو') || name.includes('مصاص') || name.includes('علكة') || name.includes('كراكر') || name.includes('ويفر') || name.includes('كورن فليكس')) return 'بسكويت وسناكس';
             if (name.includes('جبنة') || name.includes('لبن') || name.includes('لبنة') || name.includes('زبدة') || name.includes('قشطة') || name.includes('سمن') || name.includes('حليب') || name.includes('قشقوان')) return 'ألبان وأجبان';
             if (name.includes('رز') || name.includes('برغل') || name.includes('عدس') || name.includes('فريكة') || name.includes('طحين') || name.includes('سكر') || name.includes('سميد') || name.includes('معكرونة') || name.includes('سباغيتي') || name.includes('مغربية') || name.includes('كسكسة') || name.includes('قمح') || name.includes('شعيرية')) return 'حبوب وبقوليات';
@@ -142,12 +125,11 @@
             const uniqueId = product.name.replace(/\s/g, '-'); 
             const card = document.createElement('div');
             card.className = 'product-card';
-            const imageUrl = categoryImages[product.category] || categoryImages['أخرى'];
+            
             const units = ['قطعة', 'كيلو', 'لتر', 'علبة', 'كيس'];
             let unitOptions = units.map(u => `<option value="${u}">${u}</option>`).join('');
 
             card.innerHTML = `
-                <img src="${imageUrl}" class="product-img" alt="${product.category}" onerror="this.src='https://images.pexels.com/photos/1005638/pexels-photo-1005638.jpeg?auto=compress&cs=tinysrgb&w=400'">
                 <div class="product-name">${product.name}</div>
                 <div class="cart-controls">
                     <select id="unit-${uniqueId}" class="unit-selector">
