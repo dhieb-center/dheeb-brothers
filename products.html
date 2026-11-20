@@ -14,11 +14,12 @@
 
         .search-box { width: 100%; padding: 15px; margin-bottom: 15px; border: 2px solid #c9a45c; border-radius: 8px; font-family: 'Cairo', sans-serif; font-size: 16px; box-sizing: border-box; }
 
-        /* شريط الأقسام */
+        /* Categories Bar */
         .categories-bar { display: flex; overflow-x: auto; gap: 10px; margin-bottom: 20px; padding-bottom: 10px; }
         .category-btn { background-color: white; color: #4a1118; border: 2px solid #c9a45c; padding: 8px 20px; border-radius: 50px; font-family: 'Cairo', sans-serif; font-weight: bold; cursor: pointer; white-space: nowrap; transition: 0.3s; }
         .category-btn.active { background-color: #4a1118; color: #c9a45c; border-color: #4a1118; }
 
+        /* Products Grid */
         .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         @media(min-width: 768px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
 
@@ -29,7 +30,6 @@
         
         .cart-controls { display: flex; flex-direction: column; gap: 8px; }
         
-        /* القائمة المنسدلة للوحدات */
         .unit-selector { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-family: 'Cairo', sans-serif; font-size: 14px; width: 100%; box-sizing: border-box; background-color: #fff; color: #333; cursor: pointer; text-align: center; }
         
         .qty-input { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-family: 'Cairo', sans-serif; font-size: 14px; text-align: center; width: 100%; box-sizing: border-box; }
@@ -70,6 +70,7 @@
     </div>
 
     <script>
+        // English Variables & Functions (Professional Code)
         let allProducts = []; 
         let displayedProducts = []; 
         let currentIndex = 0; 
@@ -89,7 +90,6 @@
             const selectedUnit = unitSelect ? unitSelect.value : 'قطعة';
             const quantity = quantityInput ? parseFloat(quantityInput.value) : 1;
 
-            // بنحفظ المنتج مع الوحدة اللي اختارها الزبون
             const existingItemIndex = cart.findIndex(item => item.name === productName && item.unit === selectedUnit);
 
             if (existingItemIndex !== -1) {
@@ -115,7 +115,6 @@
             const card = document.createElement('div');
             card.className = 'product-card';
             
-            // قائمة الوحدات الثابتة
             const units = ['قطعة', 'كيلو', 'لتر', 'علبة', 'كيس'];
             let unitOptions = units.map(u => `<option value="${u}">${u}</option>`).join('');
 
@@ -186,12 +185,11 @@
         async function loadProducts() {
             try {
                 const response = await fetch('products.csv');
-                if (!response.ok) throw new Error("لم يتم العثور على الملف");
+                if (!response.ok) throw new Error("File not found");
                 const data = await response.text();
                 const rows = data.split('\n').filter(row => row.trim() !== '');
                 document.getElementById('loading').style.display = 'none';
 
-                // قراءة الملف (الاسم، القسم، رابط الصورة)
                 allProducts = rows.slice(1).map(row => {
                     const cols = row.split(',');
                     return {
@@ -201,7 +199,6 @@
                     };
                 });
 
-                // بناء الأزرار
                 const categories = ['الكل', ...new Set(allProducts.map(p => p.category))];
                 const catBar = document.getElementById('categoriesBar');
                 categories.forEach(cat => {
