@@ -64,7 +64,10 @@
                 <svg viewBox="0 0 24 24"><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>
             </span>
         </div>
-        <button class="logout-btn" id="logoutBtn">تسجيل خروج</button>
+        <div style="display: flex; align-items: center;">
+            <a href="index.html" style="background-color: #c9a45c; color: #4a1118; text-decoration: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; font-family: 'Cairo', sans-serif; margin-left: 10px;">زيارة الموقع 🏠</a>
+            <button class="logout-btn" id="logoutBtn">تسجيل خروج</button>
+        </div>
     </div>
 
     <div class="container">
@@ -87,7 +90,6 @@
             <div class="loading">جاري تحميل الزبائن... ⏳</div>
         </div>
 
-        <!-- قسم سعر الصرف (للمدير وصاحب المركز فقط) -->
         <div class="exchange-rate-section" id="exchangeRateSection" style="display: none; background: white; border-radius: 10px; padding: 20px; margin-top: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-right: 4px solid #4a1118;">
             <h3 style="color: #4a1118; margin-top: 0;">💵 تعديل سعر صرف الدولار اليوم</h3>
             <div style="display: flex; gap: 10px; margin-top: 15px;">
@@ -117,7 +119,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // ⚠️ تم إزالة إيميل وسام من هنا
         const allowedEmails = ['admin@dheeb.com']; 
         
         let isSuperAdmin = false; 
@@ -203,7 +204,7 @@
                 await addDoc(collection(db, "announcements"), {
                     text: text,
                     author: currentName,
-                    role: "صاحب المركز", 
+                    role: "مهندس الموقع", // <--- تم التعديل هنا
                     createdAt: serverTimestamp()
                 });
                 document.getElementById('tweetInput').value = '';
@@ -216,7 +217,6 @@
             }
         }
 
-        // دالة حذف التغريدة يدوياً
         window.deleteTweet = async function(tweetId) {
             if(confirm('هل أنت متأكد من حذف هذه التغريدة؟')) {
                 try {
@@ -252,10 +252,9 @@
                         
                         if (diffInHours > 24) {
                             await deleteDoc(doc(db, "announcements", docSnap.id));
-                            return; // تخطي هذه التغريدة
+                            return;
                         }
                     }
-                    // ----------------------------------------
 
                     const div = document.createElement('div');
                     div.className = 'tweet-card';
@@ -319,7 +318,7 @@
             if (!hasBirthday) birthdayContainer.innerHTML = '<p style="color: #856404; margin: 0;">لا يوجد أعياد ميلاد اليوم. 🍃</p>';
         }
 
-        // --- كود الزبائن (الصلاحيات) ---
+        // --- كود الزبائن ---
         async function loadCustomers() {
             const listContainer = document.getElementById('customerList');
             if(!listContainer) return;
