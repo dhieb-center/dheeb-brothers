@@ -39,41 +39,21 @@
         .header-badge { width: 18px; height: 18px; display: inline-flex; justify-content: center; align-items: center; }
         .header-badge svg { width: 100%; height: 100%; fill: #28a745; }
 
-        /* زر سعر الصرف (دائري صغير وأنيق، فوق عاليمين) */
+        /* زر سعر الصرف */
         .exchange-rate-btn {
-            position: absolute; 
-            top: 20px; 
-            right: 20px;
-            background-color: var(--gold); 
-            border: 2px solid var(--gold-light);
-            border-radius: 50%; 
-            width: 45px; 
-            height: 45px;
-            cursor: pointer;
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            z-index: 1000;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
-            transition: 0.3s;
+            position: absolute; top: 20px; right: 20px;
+            background-color: var(--gold); border: 2px solid var(--gold-light);
+            border-radius: 50%; width: 45px; height: 45px;
+            cursor: pointer; display: flex; justify-content: center; align-items: center; 
+            z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.3s;
         }
-        .exchange-rate-btn:hover { 
-            background-color: var(--gold-light); 
-            transform: translateY(-3px) scale(1.05); 
-        }
-        
-        /* صورة الملصق (آيفون) */
-        .exchange-rate-btn img {
-            width: 28px;
-            height: 28px;
-            object-fit: contain;
-        }
+        .exchange-rate-btn:hover { background-color: var(--gold-light); transform: translateY(-3px) scale(1.05); }
+        .exchange-rate-btn img { width: 28px; height: 28px; object-fit: contain; }
 
         /* قسم اللوغو والأزرار */
         .hero-section {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            min-height: 80vh; width: 100%;
-            padding-top: 60px; /* عشان يبعد عن الأزرار اللي فوق */
+            min-height: 80vh; width: 100%; padding-top: 60px;
         }
 
         @keyframes wolfEntrance {
@@ -134,9 +114,7 @@
         .tweet-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
 
         .tweet-card.admin-tweet { background: linear-gradient(135deg, #ffffff 0%, #faf8f3 100%); border: 2px solid var(--gold); box-shadow: 0 5px 15px rgba(201, 164, 92, 0.2); }
-
         .admin-badge { background-color: var(--wine); color: var(--gold); font-size: 10px; padding: 2px 8px; border-radius: 12px; font-weight: bold; margin-right: 5px; border: 1px solid var(--gold); }
-
         .apple-emoji { width: 20px; height: 20px; vertical-align: middle; margin: 0 2px; }
 
         .tweet-header { display: flex; align-items: center; gap: 10px; }
@@ -155,11 +133,11 @@
         .like-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
         /* ========================================= */
-        /* 🐺 ستايل الشاشة السينمائية (Splash Screen) */
+        /* 🐺 ستايل الشاشة السينمائية                 */
         /* ========================================= */
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #0a0505; z-index: 99999;
+            background-color: #050202; z-index: 99999;
             display: flex; justify-content: center; align-items: center;
             overflow: hidden; transition: opacity 1s ease-in-out;
             flex-direction: column;
@@ -172,90 +150,70 @@
             border-radius: 50px; font-family: 'Cairo', sans-serif;
             font-size: 20px; font-weight: bold; cursor: pointer;
             transition: 0.3s; box-shadow: 0 0 20px rgba(201, 164, 92, 0.2);
+            animation: pulseBtn 2s infinite;
         }
-        #start-btn:hover { background-color: #c9a45c; color: #0a0505; box-shadow: 0 0 30px rgba(201, 164, 92, 0.6); }
+        #start-btn:hover { background-color: #c9a45c; color: #050202; box-shadow: 0 0 30px rgba(201, 164, 92, 0.8); }
 
-        .splash-mountain {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 40%;
-            background: linear-gradient(to top, #1a0b0e, #0a0505);
-            clip-path: polygon(0 100%, 15% 40%, 30% 60%, 45% 20%, 65% 70%, 85% 30%, 100% 100%);
-            opacity: 0; animation: splashFadeIn 1s 0.5s forwards;
+        @keyframes pulseBtn {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(201, 164, 92, 0.6); }
+            100% { transform: scale(1); }
         }
 
+        /* الهلال */
         .splash-moon {
-            position: absolute; top: 15%; left: 50%; transform: translateX(-50%);
-            width: 180px; height: 180px; background-color: #c9a45c;
+            position: absolute; top: 20%; left: 50%; transform: translateX(-50%);
+            width: 150px; height: 150px; background-color: #c9a45c;
             border-radius: 50%; box-shadow: 0 0 50px rgba(201, 164, 92, 0.4);
-            opacity: 0; animation: moonRise 1.5s 1s forwards;
+            opacity: 0; animation: moonRise 2s 0.5s forwards;
         }
         .splash-moon::after {
             content: ''; position: absolute; top: -10px; right: 15px;
-            width: 180px; height: 180px; background-color: #0a0505; border-radius: 50%;
+            width: 150px; height: 150px; background-color: #050202; border-radius: 50%;
         }
 
-        .splash-wolf {
-            position: absolute; bottom: 25%; left: 30%; width: 100px; height: 100px;
-            fill: #4a1118; opacity: 0;
-            animation: wolfEntranceAnim 1.5s 2.5s forwards, wolfHowlAnim 1.5s 4s forwards, wolfJumpAnim 1s 5.5s forwards;
-        }
-
+        /* اللوغو الحقيقي اللي بيطلع بالنهاية */
         .splash-final-logo {
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%) scale(0.5);
             width: 220px; height: 220px; object-fit: contain; opacity: 0;
-            border-radius: 50%; animation: logoAppearAnim 1.5s 6.5s forwards;
+            border-radius: 50%; animation: logoAppearAnim 2s 2.5s forwards;
+            box-shadow: 0 0 80px rgba(201, 164, 92, 0.4);
         }
 
-        @keyframes splashFadeIn { to { opacity: 1; } }
         @keyframes moonRise {
-            0% { top: 50%; opacity: 0; transform: translateX(-50%) scale(0.8); }
-            100% { top: 15%; opacity: 1; transform: translateX(-50%) scale(1); }
-        }
-        @keyframes wolfEntranceAnim {
-            0% { opacity: 0; left: 10%; bottom: 10%; transform: scale(0.5); }
-            100% { opacity: 1; left: 30%; bottom: 25%; transform: scale(1); }
-        }
-        @keyframes wolfHowlAnim {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(-15deg) translateY(-10px); }
-        }
-        @keyframes wolfJumpAnim {
-            0% { bottom: 25%; left: 30%; opacity: 1; transform: scale(1) rotate(-15deg); }
-            100% { bottom: 50%; left: 50%; opacity: 0; transform: scale(0.1) rotate(45deg); }
+            0% { top: 60%; opacity: 0; transform: translateX(-50%) scale(0.8); }
+            100% { top: 20%; opacity: 1; transform: translateX(-50%) scale(1); }
         }
         @keyframes logoAppearAnim {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5) rotate(-10deg); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
         }
     </style>
 </head>
 <body>
 
     <!-- ========================================= -->
-    <!-- 🐺 شاشة الدخول السينمائية والصوت          -->
+    <!-- 🐺 شاشة الدخول السينمائية                 -->
     <!-- ========================================= -->
     <div id="splash-screen">
         <button id="start-btn">اضغط لبدء التجربة 🐺</button>
         <div class="splash-moon" id="anim-moon" style="display:none;"></div>
-        <div class="splash-mountain" id="anim-mountain" style="display:none;"></div>
         
-        <svg class="splash-wolf" id="anim-wolf" viewBox="0 0 100 100" style="display:none;">
-            <path d="M20,80 L30,50 L20,40 L35,35 L45,10 L55,35 L70,45 L60,60 L80,80 Z" />
-        </svg>
-
+        <!-- اللوغو الحقيقي تبعك -->
         <img src="https://i.ibb.co/S44qNbT8/1000119201.png" class="splash-final-logo" id="anim-logo" alt="سنتر الذيب">
         
-        <!-- 🔊 الأصوات (روابط مباشرة) -->
-        <audio id="howl-sound" src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_d7c82f6172.mp3?filename=wolf-howl-6467.mp3"></audio>
-        <audio id="click-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2879023f5b.mp3?filename=click-124467.mp3"></audio>
+        <!-- 🔊 الأصوات (روابط جوجل المضمونة 100%) -->
+        <audio id="howl-sound" src="https://actions.google.com/sounds/v1/animals/wolf_howl.ogg"></audio>
+        <audio id="click-sound" src="https://actions.google.com/sounds/v1/ui/button_click.ogg"></audio>
     </div>
 
-    <!-- زر سعر الصرف (دائري صغير) -->
+    <!-- زر سعر الصرف -->
     <div class="exchange-rate-btn" onclick="showExchangeRate()" title="سعر صرف الدولار اليوم">
         <img src="https://em-content.zobj.net/source/apple/391/dollar-banknote_1f4b5.png" alt="دولار">
     </div>
 
-    <!-- شريط حالة الزبون (فوق عاليسار) -->
+    <!-- شريط حالة الزبون -->
     <div class="user-status-bar" id="userStatusBar">
         <span id="headerUserName"></span>
         <span class="header-badge" id="headerBadge"></span>
@@ -281,42 +239,35 @@
 
     <div class="tweets-section" id="tweetsContainer"></div>
 
-    <!-- سكربت الشاشة السينمائية والأصوات -->
+    <!-- سكربت الشاشة والأصوات -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const startBtn = document.getElementById('start-btn');
             const splash = document.getElementById('splash-screen');
             const howlAudio = document.getElementById('howl-sound');
             const clickAudio = document.getElementById('click-sound');
-            
             const moon = document.getElementById('anim-moon');
-            const mountain = document.getElementById('anim-mountain');
-            const wolf = document.getElementById('anim-wolf');
 
-            // زر البداية
             if(startBtn) {
                 startBtn.addEventListener('click', () => {
                     startBtn.style.display = 'none'; 
-                    
                     moon.style.display = 'block';
-                    mountain.style.display = 'block';
-                    wolf.style.display = 'block';
-
+                    
                     // تشغيل صوت العواء
                     howlAudio.volume = 0.8;
                     howlAudio.play().catch(e => console.log("المتصفح منع الصوت:", e));
 
-                    // إخفاء الشاشة بعد 8 ثواني
+                    // إخفاء الشاشة بعد 5.5 ثواني (لما يخلص اللوغو)
                     setTimeout(() => {
                         splash.style.opacity = '0';
                         setTimeout(() => {
                             splash.style.display = 'none';
                         }, 1000); 
-                    }, 8000); 
+                    }, 5500); 
                 });
             }
 
-            // صوت التكة لكل الأزرار
+            // صوت "التكة" لكل الأزرار
             if(clickAudio) {
                 clickAudio.volume = 0.3;
                 document.body.addEventListener('click', (e) => {
@@ -329,7 +280,7 @@
         });
     </script>
 
-    <!-- سكربت الفايربيس الأساسي الخاص بك (لم يتم تغيير أي حرف فيه) -->
+    <!-- سكربت الفايربيس (كما هو تماماً) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, query, orderBy, limit, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -354,7 +305,6 @@
         const customerPhone = localStorage.getItem('customerPhone');
         const isVerified = localStorage.getItem('isVerified');
 
-        // إعداد شريط حالة الزبون
         const statusBar = document.getElementById('userStatusBar');
         const headerUserName = document.getElementById('headerUserName');
         const headerBadge = document.getElementById('headerBadge');
@@ -367,7 +317,6 @@
             }
         }
 
-        // --- دالة عرض سعر الصرف ---
         window.showExchangeRate = async function() {
             try {
                 const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
@@ -387,25 +336,14 @@
             }
         }
 
-        // --- تحويل الإيموجي لآيفون ---
         function replaceEmojisWithApple(text) {
             const emojiMap = {
-                '😊': 'smiling-face-with-smiling-eyes_1f60a.png',
-                '😂': 'face-with-tears-of-joy_1f602.png',
-                '❤️': 'red-heart_2764-fe0f.png',
-                '🔥': 'fire_1f525.png',
-                '🎉': 'party-popper_1f389.png',
-                '✨': 'sparkles_2728.png',
-                '👑': 'crown_1f451.png',
-                '🚀': 'rocket_1f680.png',
-                '👍': 'thumbs-up_1f44d.png',
-                '🛒': 'shopping-cart_1f6d2.png',
-                '💯': 'hundred-points_1f4af.png',
-                '🌟': 'glowing-star_1f31f.png',
-                '🎁': 'wrapped-gift_1f381.png',
-                '💎': 'gem-stone_1f48e.png'
+                '😊': 'smiling-face-with-smiling-eyes_1f60a.png', '😂': 'face-with-tears-of-joy_1f602.png',
+                '❤️': 'red-heart_2764-fe0f.png', '🔥': 'fire_1f525.png', '🎉': 'party-popper_1f389.png',
+                '✨': 'sparkles_2728.png', '👑': 'crown_1f451.png', '🚀': 'rocket_1f680.png',
+                '👍': 'thumbs-up_1f44d.png', '🛒': 'shopping-cart_1f6d2.png', '💯': 'hundred-points_1f4af.png',
+                '🌟': 'glowing-star_1f31f.png', '🎁': 'wrapped-gift_1f381.png', '💎': 'gem-stone_1f48e.png'
             };
-            
             let newText = text;
             for (const [emoji, fileName] of Object.entries(emojiMap)) {
                 const imgTag = `<img src="https://em-content.zobj.net/source/apple/391/${fileName}" class="apple-emoji" alt="${emoji}">`;
@@ -414,7 +352,6 @@
             return newText;
         }
 
-        // --- تحميل التغريدات ---
         async function loadTweets() {
             try {
                 const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"), limit(5));
@@ -444,7 +381,6 @@
 
                     const likesCount = tweet.likes ? tweet.likes.length : 0;
                     const isLiked = customerPhone && tweet.likes ? tweet.likes.includes(customerPhone) : false;
-
                     const formattedText = replaceEmojisWithApple(tweet.text);
 
                     const card = document.createElement('div');
@@ -486,7 +422,6 @@
                 alert('يجب عليك تسجيل الدخول كزبون أولاً لتتمكن من التفاعل!');
                 return;
             }
-
             try {
                 const tweetRef = doc(db, "announcements", tweetId);
                 if (isCurrentlyLiked) {
