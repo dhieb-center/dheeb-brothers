@@ -21,8 +21,11 @@
         .product-card { position: relative; background: white; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); padding: 15px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; border-top: 4px solid #4a1118; cursor: grab; }
         .product-card:active { cursor: grabbing; }
         
-        .edit-img-btn { display: none; position: absolute; top: 10px; left: 10px; background-color: rgba(201, 164, 92, 0.9); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 14px; z-index: 10;}
-        .admin-mode .edit-img-btn { display: block !important; } 
+        /* ✅ إخفاء زر الكاميرا نهائياً بالوضع العادي */
+        .edit-img-btn { display: none !important; position: absolute; top: 10px; left: 10px; background-color: rgba(201, 164, 92, 0.9); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 14px; z-index: 10;}
+        
+        /* ✅ إظهاره فقط عندما يكون الأدمن مسجل دخول */
+        body.admin-mode .edit-img-btn { display: block !important; } 
 
         .product-img { width: 100%; height: 120px; object-fit: cover; margin-bottom: 10px; border-radius: 8px; display: none; }
         .product-name { font-weight: 700; color: #4a1118; font-size: 16px; flex-grow: 1; display: flex; align-items: center; justify-content: center; line-height: 1.4; margin-bottom: 15px; min-height: 50px;}
@@ -67,7 +70,7 @@
             z-index: 10000;
             pointer-events: none;
             box-shadow: 0 4px 10px rgba(40, 167, 69, 0.5);
-            transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.6s ease-in;
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 1.2s ease-in;
         }
 
         /* ✅ زر الإضافة الثابت بعد الإضافة */
@@ -150,10 +153,12 @@
         let isAdmin = false;
         let selectedProductForImage = "";
 
+        // ✅ التحقق من الأدمن بشكل آمن ودقيق
         onAuthStateChanged(auth, (user) => {
-            if (user && user.email === 'admin@dheeb.com') {
+            if (user && user.email && user.email.toLowerCase() === 'admin@dheeb.com') {
                 isAdmin = true;
-                document.body.classList.add('admin-mode');
+                document.body.classList.add('admin-mode'); // إظهار زر الكاميرا
+                
                 if(allProducts.length > 0) {
                     document.getElementById('productsGrid').innerHTML = '';
                     currentIndex = 0;
@@ -161,12 +166,15 @@
                 }
             } else {
                 isAdmin = false;
-                document.body.classList.remove('admin-mode');
+                document.body.classList.remove('admin-mode'); // إخفاء الزر للزبائن
             }
         });
 
         window.openImageModal = function(productName) {
-            if (!isAdmin) return;
+            if (!isAdmin) {
+                alert("غير مصرح لك بإضافة صور. هذه الصلاحية للإدارة فقط.");
+                return;
+            }
             selectedProductForImage = productName;
             document.getElementById('modalProductName').innerText = productName;
             document.getElementById('imageFileInput').value = ''; 
@@ -276,10 +284,8 @@
             localStorage.setItem('cart', JSON.stringify(cart)); 
             updateCartCount(); 
 
-            // ✅ حركة الطيران للسلة
             animateFlyToCart(btnElement);
 
-            // ✅ الزر يضل أخضر وثابت
             btnElement.classList.add('btn-added');
             const originalText = btnElement.innerText;
             btnElement.innerText = "تمت الإضافة ✓";
@@ -287,10 +293,9 @@
             setTimeout(() => { 
                 btnElement.classList.remove('btn-added');
                 btnElement.innerText = originalText; 
-            }, 2000);
+            }, 3000);
         }
 
-        // ✅ دالة الأنيميشن (الطيران للسلة)
         function animateFlyToCart(startElement) {
             const cartIcon = document.getElementById('floatingCart');
             const startRect = startElement.getBoundingClientRect();
@@ -308,10 +313,10 @@
             const deltaX = endRect.left + endRect.width / 2 - (startRect.left + startRect.width / 2);
             const deltaY = endRect.top + endRect.height / 2 - (startRect.top + startRect.height / 2);
 
-            requestAnimationFrame(() => {
-                flyer.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.3)`;
-                flyer.style.opacity = '0.5';
-            });
+            setTimeout(() => {
+                flyer.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.4)`;
+                flyer.style.opacity = '0.3';
+            }, 50);
 
             setTimeout(() => {
                 flyer.remove();
@@ -320,8 +325,8 @@
                 setTimeout(() => {
                     cartIcon.style.transform = 'scale(1)';
                     cartIcon.style.backgroundColor = '#4a1118';
-                }, 300);
-            }, 600);
+                }, 400);
+            }, 1200);
         }
 
         function createProductCard(product) {
