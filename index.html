@@ -153,9 +153,102 @@
         .like-btn:hover { color: #e0245e; }
         .like-btn.liked { color: #e0245e; font-weight: bold; }
         .like-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+        /* ========================================= */
+        /* 🐺 ستايل الشاشة السينمائية (Splash Screen) */
+        /* ========================================= */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #0a0505; z-index: 99999;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; transition: opacity 1s ease-in-out;
+            flex-direction: column;
+        }
+
+        #start-btn {
+            position: absolute; z-index: 100000;
+            background-color: transparent; color: #c9a45c;
+            border: 2px solid #c9a45c; padding: 15px 40px;
+            border-radius: 50px; font-family: 'Cairo', sans-serif;
+            font-size: 20px; font-weight: bold; cursor: pointer;
+            transition: 0.3s; box-shadow: 0 0 20px rgba(201, 164, 92, 0.2);
+        }
+        #start-btn:hover { background-color: #c9a45c; color: #0a0505; box-shadow: 0 0 30px rgba(201, 164, 92, 0.6); }
+
+        .splash-mountain {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 40%;
+            background: linear-gradient(to top, #1a0b0e, #0a0505);
+            clip-path: polygon(0 100%, 15% 40%, 30% 60%, 45% 20%, 65% 70%, 85% 30%, 100% 100%);
+            opacity: 0; animation: splashFadeIn 1s 0.5s forwards;
+        }
+
+        .splash-moon {
+            position: absolute; top: 15%; left: 50%; transform: translateX(-50%);
+            width: 180px; height: 180px; background-color: #c9a45c;
+            border-radius: 50%; box-shadow: 0 0 50px rgba(201, 164, 92, 0.4);
+            opacity: 0; animation: moonRise 1.5s 1s forwards;
+        }
+        .splash-moon::after {
+            content: ''; position: absolute; top: -10px; right: 15px;
+            width: 180px; height: 180px; background-color: #0a0505; border-radius: 50%;
+        }
+
+        .splash-wolf {
+            position: absolute; bottom: 25%; left: 30%; width: 100px; height: 100px;
+            fill: #4a1118; opacity: 0;
+            animation: wolfEntranceAnim 1.5s 2.5s forwards, wolfHowlAnim 1.5s 4s forwards, wolfJumpAnim 1s 5.5s forwards;
+        }
+
+        .splash-final-logo {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            width: 220px; height: 220px; object-fit: contain; opacity: 0;
+            border-radius: 50%; animation: logoAppearAnim 1.5s 6.5s forwards;
+        }
+
+        @keyframes splashFadeIn { to { opacity: 1; } }
+        @keyframes moonRise {
+            0% { top: 50%; opacity: 0; transform: translateX(-50%) scale(0.8); }
+            100% { top: 15%; opacity: 1; transform: translateX(-50%) scale(1); }
+        }
+        @keyframes wolfEntranceAnim {
+            0% { opacity: 0; left: 10%; bottom: 10%; transform: scale(0.5); }
+            100% { opacity: 1; left: 30%; bottom: 25%; transform: scale(1); }
+        }
+        @keyframes wolfHowlAnim {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(-15deg) translateY(-10px); }
+        }
+        @keyframes wolfJumpAnim {
+            0% { bottom: 25%; left: 30%; opacity: 1; transform: scale(1) rotate(-15deg); }
+            100% { bottom: 50%; left: 50%; opacity: 0; transform: scale(0.1) rotate(45deg); }
+        }
+        @keyframes logoAppearAnim {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
     </style>
 </head>
 <body>
+
+    <!-- ========================================= -->
+    <!-- 🐺 شاشة الدخول السينمائية والصوت          -->
+    <!-- ========================================= -->
+    <div id="splash-screen">
+        <button id="start-btn">اضغط لبدء التجربة 🐺</button>
+        <div class="splash-moon" id="anim-moon" style="display:none;"></div>
+        <div class="splash-mountain" id="anim-mountain" style="display:none;"></div>
+        
+        <svg class="splash-wolf" id="anim-wolf" viewBox="0 0 100 100" style="display:none;">
+            <path d="M20,80 L30,50 L20,40 L35,35 L45,10 L55,35 L70,45 L60,60 L80,80 Z" />
+        </svg>
+
+        <img src="https://i.ibb.co/S44qNbT8/1000119201.png" class="splash-final-logo" id="anim-logo" alt="سنتر الذيب">
+        
+        <!-- 🔊 الأصوات (روابط مباشرة) -->
+        <audio id="howl-sound" src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_d7c82f6172.mp3?filename=wolf-howl-6467.mp3"></audio>
+        <audio id="click-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2879023f5b.mp3?filename=click-124467.mp3"></audio>
+    </div>
 
     <!-- زر سعر الصرف (دائري صغير) -->
     <div class="exchange-rate-btn" onclick="showExchangeRate()" title="سعر صرف الدولار اليوم">
@@ -188,6 +281,55 @@
 
     <div class="tweets-section" id="tweetsContainer"></div>
 
+    <!-- سكربت الشاشة السينمائية والأصوات -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const startBtn = document.getElementById('start-btn');
+            const splash = document.getElementById('splash-screen');
+            const howlAudio = document.getElementById('howl-sound');
+            const clickAudio = document.getElementById('click-sound');
+            
+            const moon = document.getElementById('anim-moon');
+            const mountain = document.getElementById('anim-mountain');
+            const wolf = document.getElementById('anim-wolf');
+
+            // زر البداية
+            if(startBtn) {
+                startBtn.addEventListener('click', () => {
+                    startBtn.style.display = 'none'; 
+                    
+                    moon.style.display = 'block';
+                    mountain.style.display = 'block';
+                    wolf.style.display = 'block';
+
+                    // تشغيل صوت العواء
+                    howlAudio.volume = 0.8;
+                    howlAudio.play().catch(e => console.log("المتصفح منع الصوت:", e));
+
+                    // إخفاء الشاشة بعد 8 ثواني
+                    setTimeout(() => {
+                        splash.style.opacity = '0';
+                        setTimeout(() => {
+                            splash.style.display = 'none';
+                        }, 1000); 
+                    }, 8000); 
+                });
+            }
+
+            // صوت التكة لكل الأزرار
+            if(clickAudio) {
+                clickAudio.volume = 0.3;
+                document.body.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('button') || e.target.closest('a')) {
+                        clickAudio.currentTime = 0; 
+                        clickAudio.play().catch(e => {}); 
+                    }
+                });
+            }
+        });
+    </script>
+
+    <!-- سكربت الفايربيس الأساسي الخاص بك (لم يتم تغيير أي حرف فيه) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, query, orderBy, limit, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
