@@ -6,6 +6,7 @@
     <title>الفاتورة - سنتر الذيب</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     
+    <!-- مكتبة تحويل التصميم إلى صورة -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
@@ -49,18 +50,20 @@
         .signature-line { width: 150px; border-bottom: 1px solid #4a1118; margin-top: 30px; }
 
         .actions { display: flex; gap: 10px; margin-top: 30px; flex-wrap: wrap; width: 100%; max-width: 700px; flex-direction: column; }
-        .btn { padding: 18px; border-radius: 8px; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 18px; cursor: pointer; text-align: center; text-decoration: none; transition: 0.3s; border: none; display: inline-flex; justify-content: center; align-items: center; gap: 8px; width: 100%; }
-        .btn-save-pdf { background-color: #4a1118; color: #c9a45c; box-shadow: 0 4px 10px rgba(74, 17, 24, 0.3); }
-        .btn-save-pdf:active { transform: scale(0.98); }
+        .btn { padding: 16px; border-radius: 8px; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 16px; cursor: pointer; text-align: center; text-decoration: none; transition: 0.3s; border: none; display: inline-flex; justify-content: center; align-items: center; gap: 8px; width: 100%; }
+        
+        /* زر الواتساب */
+        .btn-whatsapp { background-color: #25D366; color: white; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); font-size: 18px; }
+        .btn-whatsapp:active { transform: scale(0.98); }
+
         .btn-edit { background-color: transparent; border: 2px solid #4a1118; color: #4a1118; font-size: 15px; padding: 12px; }
-        .btn svg { width: 22px; height: 22px; fill: currentColor; }
         
         .empty-msg { text-align: center; color: #777; padding: 40px 0; font-size: 18px; font-weight: 600;}
-
+        
         /* نافذة عرض الصورة */
         .modal-image-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; padding: 20px; box-sizing: border-box; }
-        .modal-image-content { background: #fff; padding: 15px; border-radius: 10px; max-width: 100%; max-height: 65vh; overflow: auto; text-align: center; }
-        .modal-image-content img { width: 100%; max-width: 350px; height: auto; border: 1px solid #ccc; border-radius: 5px; }
+        .modal-image-content { background: #fff; padding: 15px; border-radius: 10px; max-width: 100%; max-height: 80vh; overflow: auto; text-align: center; }
+        .modal-image-content img { width: 100%; max-width: 400px; height: auto; border: 1px solid #ccc; border-radius: 5px; }
         
         @media print {
             body { background-color: #fff; padding: 0; }
@@ -80,7 +83,6 @@
             <div class="invoice-info" style="text-align: left;">
                 <h1>سنتر الذيب</h1>
                 <p>AL-DHEEB CENTER</p>
-                <p>الرقم الضريبي: 000000000</p>
                 <div class="invoice-title">فاتورة مبيعات</div>
             </div>
         </div>
@@ -131,7 +133,6 @@
         <div class="invoice-footer">
             <div class="footer-text">
                 <p class="thanks">شكراً لتسوقكم معنا! 🌟</p>
-                <p>يرجى مراجعة الطلب قبل التأكيد النهائي.</p>
                 <p>هاتف: 0985164493</p>
             </div>
             <div class="signature">
@@ -142,33 +143,30 @@
     </div>
 
     <div class="actions">
-        <button onclick="prepareToSend()" class="btn btn-save-pdf" id="saveImgBtn">
-            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-            تجهيز الفاتورة للإرسال
+        <!-- ✅ الزر 1: إرسال كأسطر نصية للواتساب -->
+        <button onclick="sendTextToWhatsApp()" class="btn btn-whatsapp">
+            <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            إرسال الطلب لوسام على الواتساب
+        </button>
+
+        <!-- ✅ الزر 2: عرض الفاتورة كصورة (لحفظها) -->
+        <button onclick="generateImage()" class="btn btn-edit" style="border-color: #25D366; color: #25D366;">
+            📸 عرض وحفظ صورة الفاتورة
         </button>
         
-        <a href="products.html" class="btn btn-edit">تعديل الطلب (العودة للمنتجات)</a>
+        <a href="products.html" class="btn btn-edit">تعديل الطلب</a>
     </div>
 
     <!-- نافذة عرض الصورة -->
     <div id="imageModal" class="modal-image-overlay">
         <div class="modal-image-content">
-            <h3 style="color: #4a1118; margin: 0 0 10px 0; font-size: 16px;">صورة الفاتورة جاهزة للإرسال</h3>
-            <p style="font-size: 12px; color: #d9534f; margin-bottom: 10px; font-weight: bold;">(اضغط مطولاً على الصورة واختر "نسخ" أو "Copy Photo")</p>
+            <h3 style="color: #4a1118; margin: 0 0 10px 0; font-size: 16px;">صورة الفاتورة</h3>
+            <p style="font-size: 12px; color: #d9534f; margin-bottom: 10px; font-weight: bold;">(اضغط مطولاً على الصورة واختر "حفظ الصورة")</p>
             <img id="generatedImage" src="" alt="الفاتورة">
         </div>
-        
-        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 350px; margin-top: 15px;">
-            <a href="#" id="waSendBtn" target="_blank" class="btn" style="background-color: #25D366; color: white; padding: 15px; font-size: 16px;">
-                1. فتح الواتساب
-            </a>
-            <div style="background: #fff; padding: 10px; border-radius: 8px; font-size: 13px; text-align: center; color: #333; font-weight: bold;">
-                2. اضغط في الواتساب على "لصق" (Paste) لإرسال الصورة.
-            </div>
-            <button onclick="document.getElementById('imageModal').style.display='none'" class="btn" style="background-color: transparent; border: 1px solid #fff; color: #fff; padding: 10px; font-size: 14px;">
-                إغلاق
-            </button>
-        </div>
+        <button onclick="document.getElementById('imageModal').style.display='none'" class="btn" style="background-color: #fff; color: #333; padding: 12px; font-size: 15px; margin-top: 15px; max-width: 350px;">
+            إغلاق الصورة
+        </button>
     </div>
 
     <script>
@@ -230,9 +228,45 @@
             }
         }
 
-        window.prepareToSend = function() {
+        // ✅ 1. دالة إرسال النص للواتساب
+        window.sendTextToWhatsApp = function() {
             if (cart.length === 0) {
-                alert("السلة فاضية، لا يمكن تجهيز فاتورة.");
+                alert("السلة فاضية، لا يمكن إرسال الطلب.");
+                return;
+            }
+
+            const isDelivery = document.querySelector('input[name="delivery"]:checked').value === 'delivery';
+            const address = document.getElementById('deliveryAddress').value.trim();
+            const notes = document.getElementById('orderNotes').value.trim();
+
+            if (isDelivery && address === '') {
+                alert('⚠️ يرجى كتابة عنوان التوصيل بالتفصيل قبل الإرسال.');
+                document.getElementById('deliveryAddress').focus();
+                return; 
+            }
+
+            let message = `مرحباً وسام، أنا الزبون: ${customerName}\n`;
+            message += `رقم الهاتف: ${customerPhone}\n`;
+            message += `طريقة الاستلام: ${isDelivery ? 'توصيل (دليفري)' : 'استلام من المركز'}\n`;
+            
+            if (isDelivery) message += `العنوان: ${address}\n`;
+            if (notes !== '') message += `📝 ملاحظات: ${notes}\n`;
+            
+            message += `\n📦 *تفاصيل الطلب:*\n`;
+            cart.forEach(item => {
+                message += `- ${item.name} | ${item.quantity} ${item.unit}\n`;
+            });
+
+            message += `\nشكراً!`;
+
+            const waLink = `https://wa.me/${ownerPhone}?text=${encodeURIComponent(message)}`;
+            window.open(waLink, '_blank');
+        }
+
+        // ✅ 2. دالة عرض الصورة (عشان يقدر يحفظها)
+        window.generateImage = function() {
+            if (cart.length === 0) {
+                alert("السلة فاضية، لا يمكن إنشاء صورة.");
                 return;
             }
 
@@ -240,12 +274,13 @@
             const addressCheck = document.getElementById('deliveryAddress').value.trim();
             
             if (isDeliveryCheck && addressCheck === '') {
-                alert('⚠️ يرجى كتابة عنوان التوصيل بالتفصيل قبل تأكيد الطلب.');
+                alert('⚠️ يرجى كتابة عنوان التوصيل بالتفصيل أولاً.');
                 document.getElementById('deliveryAddress').focus();
                 return; 
             }
-            
-            const btn = document.getElementById('saveImgBtn');
+
+            const btn = event.target;
+            const originalText = btn.innerHTML;
             btn.innerHTML = "جاري التجهيز...";
 
             const invoiceBox = document.getElementById('invoiceBox');
@@ -271,7 +306,6 @@
             html2canvas(invoiceBox, { scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false }).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
                 
-                // إرجاع التصميم لطبيعته
                 extraInfo.innerHTML = originalHTML;
                 window.toggleAddress = function() {
                     const dRadio = document.querySelector('input[name="delivery"]:checked').value;
@@ -285,19 +319,15 @@
                 if (isDelivery) document.getElementById('deliveryAddress').style.display = 'block';
                 deleteButtons.forEach(b => b.style.visibility = 'visible');
                 
-                // عرض الصورة
                 document.getElementById('generatedImage').src = imgData;
                 document.getElementById('imageModal').style.display = 'flex';
-                btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> تجهيز الفاتورة للإرسال`;
-
-                const waLink = `https://wa.me/${ownerPhone}?text=${encodeURIComponent('مرحباً وسام، أنا الزبون: ' + customerName + '\nلقد قمت بتجهيز فاتورة طلبي، وهي مرفقة كصورة. يرجى تأكيد الطلب.')}`;
-                document.getElementById('waSendBtn').href = waLink;
+                btn.innerHTML = originalText;
 
             }).catch(err => {
-                alert("حدث خطأ أثناء الإنشاء: " + err);
+                alert("حدث خطأ أثناء إنشاء الصورة: " + err);
                 document.getElementById('extraInfoSection').innerHTML = originalHTML;
                 deleteButtons.forEach(b => b.style.visibility = 'visible');
-                btn.innerHTML = "تجهيز الفاتورة للإرسال";
+                btn.innerHTML = originalText;
             });
         }
 
