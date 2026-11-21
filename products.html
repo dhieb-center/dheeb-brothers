@@ -35,6 +35,8 @@
         .load-more-btn { background-color: #4a1118; color: #c9a45c; border: 2px solid #c9a45c; padding: 12px 30px; border-radius: 50px; cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: bold; font-size: 18px; transition: 0.3s; }
         .load-more-btn:hover { background-color: #c9a45c; color: #4a1118; }
         .hidden { display: none; }
+        
+        /* زر السلة العائم */
         .floating-cart { position: fixed; bottom: 20px; left: 20px; background-color: #4a1118; color: white; border: 2px solid #c9a45c; border-radius: 50%; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 1000; }
         .cart-count-badge { position: absolute; top: 0; right: 0; background-color: #c9a45c; color: #4a1118; font-size: 14px; font-weight: bold; width: 22px; height: 22px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
         .loading { text-align: center; font-size: 20px; color: #4a1118; font-weight: bold; margin-top: 50px; }
@@ -56,9 +58,9 @@
         <a href="index.html">العودة للرئيسية 🏠</a>
     </div>
 
-    <!-- ✅ زر عرض الفاتورة في الأعلى -->
+    <!-- زر عرض الفاتورة -->
     <div style="text-align:center; margin-bottom: 15px;">
-        <a href="invoice.html" style="display:inline-block; background:#25D366; color:white; padding:12px 25px; border-radius:8px; text-decoration:none; font-weight:bold; font-family:'Cairo'; font-size:15px;">
+        <a href="cart.html" style="display:inline-block; background:#25D366; color:white; padding:12px 25px; border-radius:8px; text-decoration:none; font-weight:bold; font-family:'Cairo'; font-size:15px;">
             🧾 عرض الفاتورة (السلة)
         </a>
     </div>
@@ -74,15 +76,15 @@
         <button class="load-more-btn" onclick="loadMoreProducts()">عرض المزيد من المنتجات ↓</button>
     </div>
 
-    <!-- ✅ زر السلة العائم يذهب لصفحة الفاتورة -->
-    <div class="floating-cart" id="floatingCart" onclick="window.location.href='invoice.html'">
+    <!-- زر السلة العائم -->
+    <div class="floating-cart" id="floatingCart" onclick="window.location.href='cart.html'">
         🛒
         <span class="cart-count-badge" id="cartCount">0</span>
     </div>
 
-    <!-- ✅ شريط سفلي لعرض السلة بعد الإضافة -->
+    <!-- شريط سفلي يظهر عند إضافة منتجات -->
     <div id="viewCartBar" style="display:none; position:fixed; bottom:90px; left:20px; right:20px; z-index:999; text-align:center;">
-        <a href="invoice.html" style="display:block; background:#4a1118; color:#c9a45c; padding:15px; border-radius:10px; text-decoration:none; font-weight:bold; font-family:'Cairo'; font-size:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3);">
+        <a href="cart.html" style="display:block; background:#4a1118; color:#c9a45c; padding:15px; border-radius:10px; text-decoration:none; font-weight:bold; font-family:'Cairo'; font-size:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3);">
             🧾 عرض السلة / الفاتورة
         </a>
     </div>
@@ -234,7 +236,6 @@
         }
         updateCartCount(); 
 
-        // ✅ نسخة محسّنة وآمنة من addToCart
         window.addToCart = function(uniqueId, productName, btnElement) {
             const unitSelect = document.getElementById('unit-' + uniqueId);
             const quantityInput = document.getElementById('qty-' + uniqueId);
@@ -286,7 +287,6 @@
                 </div>
             `;
 
-            // ✅ ربط زر الإضافة بأمان (بدون مشاكل الاقتباسات في الأسماء)
             const addBtn = card.querySelector('.add-btn');
             addBtn.addEventListener('click', () => addToCart(uniqueId, product.name, addBtn));
 
@@ -355,7 +355,7 @@
         }
 
         async function loadProductImages() {
-            productImages = {}; // ✅ تصفير قبل التحميل
+            productImages = {}; 
             try {
                 const querySnapshot = await getDocs(collection(db, "product_images"));
                 querySnapshot.forEach((doc) => {
