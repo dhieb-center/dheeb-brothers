@@ -21,8 +21,10 @@
         .product-card { position: relative; background: white; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); padding: 15px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; border-top: 4px solid #4a1118; cursor: grab; }
         .product-card:active { cursor: grabbing; }
         
+        /* ✅ إخفاء زر الكاميرا نهائياً بالوضع العادي */
         .edit-img-btn { display: none !important; position: absolute; top: 10px; left: 10px; background-color: rgba(201, 164, 92, 0.9); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 14px; z-index: 10;}
         
+        /* ✅ إظهاره فقط عندما يكون المدير (وسام) مسجل دخول */
         body.main-admin-mode .edit-img-btn { display: block !important; } 
 
         .product-img { width: 100%; height: 120px; object-fit: cover; margin-bottom: 10px; border-radius: 8px; display: none; }
@@ -121,7 +123,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, addDoc, serverTimestamp, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -149,32 +151,27 @@
         let isMainAdmin = false; 
         let selectedProductForImage = "";
 
-        // ✅ قراءة الصلاحيات من قاعدة البيانات مباشرة
-        onAuthStateChanged(auth, async (user) => {
+        // ✅ التحقق المباشر من الإيميلات (بدون فايربيس)
+        onAuthStateChanged(auth, (user) => {
             if (user && user.email) {
-                try {
-                    // نبحث عن إيميل المستخدم في مجموعة admins
-                    const q = query(collection(db, "admins"), where("email", "==", user.email.toLowerCase()));
-                    const querySnapshot = await getDocs(q);
-                    
-                    if (!querySnapshot.empty) {
-                        const adminData = querySnapshot.docs[0].data();
-                        
-                        // إذا كان دوره manager (يعني وسام) بيقدر يرفع صور
-                        if (adminData.role === 'manager') {
-                            isMainAdmin = true;
-                            document.body.classList.add('main-admin-mode'); 
-                        } else {
-                            // إذا كان owner (حاتم) ما بيقدر يرفع صور
-                            isMainAdmin = false;
-                            document.body.classList.remove('main-admin-mode');
-                        }
-                    } else {
-                        isMainAdmin = false;
-                        document.body.classList.remove('main-admin-mode');
-                    }
-                } catch (error) {
-                    console.error("خطأ في قراءة الصلاحيات:", error);
+                const userEmail = user.email.toLowerCase();
+                
+                // الإيميلات المسموحة
+                const wesamEmail = "wesam@dheeb.com"; 
+                const hatemEmail = "hatem@dheeb.com"; 
+
+                if (userEmail === wesamEmail) {
+                    // وسام: بيقدر يرفع صور
+                    isMainAdmin = true;
+                    document.body.classList.add('main-admin-mode');
+                } else if (userEmail === hatemEmail) {
+                    // حاتم: بيدخل بس ما بيقدر يرفع صور
+                    isMainAdmin = false;
+                    document.body.classList.remove('main-admin-mode');
+                } else {
+                    // أي حساب تاني (زبون)
+                    isMainAdmin = false;
+                    document.body.classList.remove('main-admin-mode');
                 }
             } else {
                 isMainAdmin = false;
