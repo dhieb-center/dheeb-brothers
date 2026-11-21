@@ -93,4 +93,262 @@
             <h3>طريقة الاستلام:</h3>
             <div class="radio-group">
                 <label class="radio-label">
-                    <input type="radio" name="
+                    <input type="radio" name="delivery" value="pickup" checked onchange="toggleAddress()"> استلام من المركز
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="delivery" value="delivery" onchange="toggleAddress()"> توصيل (دليفري)
+                </label>
+            </div>
+            <input type="text" id="deliveryAddress" class="address-input" placeholder="اكتب عنوان التوصيل بالتفصيل هنا...">
+        </div>
+
+        <div class="notes-section" id="notesSection">
+            <label>📝 ملاحظات إضافية (اختياري):</label>
+            <textarea id="orderNotes" class="notes-input" placeholder="اكتب أي ملاحظات تخص الطلب هنا... (مثلاً: التوصيل بعد العصر)"></textarea>
+        </div>
+
+        <div class="invoice-footer">
+            <p class="thanks">شكراً لتسوقكم معنا! 🌟</p>
+            <p>يرجى مراجعة الطلب قبل التأكيد النهائي.</p>
+        </div>
+    </div>
+
+    <div class="actions">
+        <a href="products.html" class="btn btn-edit">تعديل الطلب</a>
+        <button onclick="saveAndSend()" class="btn btn-save-pdf" id="savePdfBtn">
+            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            حفظ الفاتورة وإرسال
+        </button>
+        <button onclick="copyOrderDetails()" class="btn btn-whatsapp">
+            <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            نسخ تفاصيل الطلب
+        </button>
+    </div>
+
+    <script>
+        const ownerPhone = "963985164493"; 
+
+        const customerName = localStorage.getItem('customerName') || 'زبون غير مسجل';
+        const customerPhone = localStorage.getItem('customerPhone') || 'غير متوفر';
+        
+        document.getElementById('customerNameDisplay').innerText = customerName;
+        document.getElementById('customerPhoneDisplay').innerText = customerPhone;
+
+        const today = new Date();
+        document.getElementById('invoiceDate').innerText = today.toLocaleDateString('ar-EG-u-nu-latn');
+
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const invoiceBody = document.getElementById('invoiceBody');
+
+        window.toggleAddress = function() {
+            const deliveryRadio = document.querySelector('input[name="delivery"]:checked').value;
+            const addressInput = document.getElementById('deliveryAddress');
+            if (deliveryRadio === 'delivery') {
+                addressInput.style.display = 'block';
+            } else {
+                addressInput.style.display = 'none';
+                addressInput.value = ''; 
+            }
+        }
+
+        function renderInvoice() {
+            invoiceBody.innerHTML = '';
+            
+            if (cart.length === 0) {
+                invoiceBody.innerHTML = '<tr><td colspan="4" class="empty-msg">السلة فاضية! اذهب لتصفح المنتجات وإضافة منتجات.</td></tr>';
+                return;
+            }
+
+            cart.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="item-name">${item.name}</td>
+                    <td style="text-align: center;">${item.unit}</td>
+                    <td class="item-qty">${item.quantity}</td>
+                    <td style="text-align: center;">
+                        <button onclick="removeItem(${index})" style="background:none; border:none; color:#dc3545; cursor:pointer; font-weight:900; font-size: 18px;">✖</button>
+                    </td>
+                `;
+                invoiceBody.appendChild(row);
+            });
+        }
+
+        window.removeItem = function(index) {
+            if(confirm('هل تريد إزالة هذا المنتج من الطلب؟')) {
+                cart.splice(index, 1);
+                localStorage.setItem('cart', JSON.stringify(cart));
+                renderInvoice();
+            }
+        }
+
+        window.saveAndSend = function() {
+            if (cart.length === 0) {
+                alert("السلة فاضية، لا يمكن حفظ فاتورة.");
+                return;
+            }
+
+            const isDeliveryCheck = document.querySelector('input[name="delivery"]:checked').value === 'delivery';
+            const addressCheck = document.getElementById('deliveryAddress').value.trim();
+            
+            if (isDeliveryCheck && addressCheck === '') {
+                alert('⚠️ يرجى كتابة عنوان التوصيل بالتفصيل قبل تأكيد الطلب.');
+                document.getElementById('deliveryAddress').focus();
+                return; 
+            }
+            
+            const btn = document.getElementById('savePdfBtn');
+            btn.innerHTML = "جاري المعالجة...";
+
+            const invoiceBox = document.getElementById('invoiceBox');
+            const deleteButtons = document.querySelectorAll('#invoiceBody button');
+            deleteButtons.forEach(b => b.style.visibility = 'hidden');
+            
+            const deliverySection = document.getElementById('deliverySection');
+            const radioGroup = deliverySection.querySelector('.radio-group');
+            const addressInput = document.getElementById('deliveryAddress');
+            const isDelivery = document.querySelector('input[name="delivery"]:checked').value === 'delivery';
+            
+            const tempDeliveryInfo = document.createElement('p');
+            tempDeliveryInfo.id = 'tempDeliveryInfo';
+            tempDeliveryInfo.style.margin = '8px 0';
+            tempDeliveryInfo.style.fontSize = '16px';
+            tempDeliveryInfo.style.fontWeight = '700';
+            tempDeliveryInfo.style.color = '#4a1118';
+            
+            if (isDelivery) {
+                tempDeliveryInfo.innerHTML = `<strong>طريقة الاستلام:</strong> توصيل (دليفري)<br><strong>العنوان:</strong> ${addressInput.value || 'لم يتم تحديد العنوان'}`;
+            } else {
+                tempDeliveryInfo.innerHTML = `<strong>طريقة الاستلام:</strong> استلام من المركز`;
+            }
+            
+            deliverySection.insertBefore(tempDeliveryInfo, radioGroup);
+            radioGroup.style.display = 'none';
+            addressInput.style.display = 'none';
+            deliverySection.querySelector('h3').style.display = 'none';
+
+            const notesSection = document.getElementById('notesSection');
+            const notesInput = document.getElementById('orderNotes');
+            const tempNotes = document.createElement('p');
+            tempNotes.id = 'tempNotes';
+            tempNotes.style.margin = '8px 0';
+            tempNotes.style.fontSize = '16px';
+            tempNotes.style.fontWeight = '700';
+            tempNotes.style.color = '#4a1118';
+            
+            if (notesInput.value.trim() !== '') {
+                tempNotes.innerHTML = `<strong>ملاحظات:</strong> ${notesInput.value}`;
+                notesSection.insertBefore(tempNotes, notesInput);
+                notesInput.style.display = 'none';
+                notesSection.querySelector('label').style.display = 'none';
+            } else {
+                notesSection.style.display = 'none';
+            }
+
+            html2canvas(invoiceBox, { 
+                scale: 3, 
+                backgroundColor: '#ffffff',
+                useCORS: true 
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                
+                const fileName = `فاتورة الزبون ${customerName} من سنتر الذيب.pdf`;
+                pdf.save(fileName);
+
+                deleteButtons.forEach(b => b.style.visibility = 'visible');
+                radioGroup.style.display = 'flex';
+                deliverySection.querySelector('h3').style.display = 'block';
+                if(isDelivery) addressInput.style.display = 'block';
+                tempDeliveryInfo.remove();
+                
+                if (notesInput.value.trim() !== '') {
+                    notesInput.style.display = 'block';
+                    notesSection.querySelector('label').style.display = 'block';
+                    tempNotes.remove();
+                } else {
+                    notesSection.style.display = 'block';
+                }
+                
+                btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> حفظ الفاتورة وإرسال`;
+
+                const waLink = `https://wa.me/${ownerPhone}?text=مرحباً%2C%20أنا%20الزبون%20${encodeURIComponent(customerName)}%2C%20لقد%20قمت%20بحفظ%20فاتورة%20طلبي%20كملف%20PDF.%20سأقوم%20بإرفاقها%20الآن.`;
+                
+                const popup = document.createElement('div');
+                popup.style.cssText = `
+                    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                    background-color: white; padding: 25px; border-radius: 12px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 9999;
+                    text-align: center; font-family: 'Cairo', sans-serif; max-width: 350px;
+                    border: 2px solid #4a1118;
+                `;
+                popup.innerHTML = `
+                    <h3 style="color: #4a1118; margin-top: 0;">✅ تم حفظ الفاتورة بنجاح!</h3>
+                    <p style="color: #555;">تم حفظ الملف باسم "فاتورة الزبون ${customerName} من سنتر الذيب.pdf"</p>
+                    <p style="color: #555; font-size: 14px;">الآن اضغط على الزر بالأسفل لفتح الواتساب، ثم أرفق ملف الـ PDF وأرسله.</p>
+                    <a href="${waLink}" target="_blank" style="display: block; background-color: #25D366; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 15px;">فتح الواتساب وإرفاق الفاتورة</a>
+                    <button onclick="this.parentElement.remove()" style="background: none; border: none; color: #999; margin-top: 10px; cursor: pointer; font-family: 'Cairo', sans-serif;">إغلاق</button>
+                `;
+                document.body.appendChild(popup);
+
+            }).catch(err => {
+                alert("حدث خطأ أثناء حفظ الفاتورة: " + err);
+                deleteButtons.forEach(b => b.style.visibility = 'visible');
+                radioGroup.style.display = 'flex';
+                deliverySection.querySelector('h3').style.display = 'block';
+                if(isDelivery) addressInput.style.display = 'block';
+                if(tempDeliveryInfo) tempDeliveryInfo.remove();
+                if(tempNotes) tempNotes.remove();
+                notesInput.style.display = 'block';
+                notesSection.querySelector('label').style.display = 'block';
+                notesSection.style.display = 'block';
+                btn.innerHTML = "حفظ الفاتورة وإرسال";
+            });
+        }
+
+        window.copyOrderDetails = function() {
+            if (cart.length === 0) {
+                alert("السلة فاضية، لا يمكن نسخ تفاصيل.");
+                return;
+            }
+
+            const isDelivery = document.querySelector('input[name="delivery"]:checked').value === 'delivery';
+            const address = document.getElementById('deliveryAddress').value;
+            const notes = document.getElementById('orderNotes').value;
+
+            let message = `مرحباً، أنا الزبون: ${customerName}\n`;
+            message += `طريقة الاستلام: ${isDelivery ? 'توصيل (دليفري)' : 'استلام من المركز'}\n`;
+            
+            if (isDelivery) {
+                message += `العنوان: ${address || 'لم يتم تحديد العنوان'}\n`;
+            }
+            
+            if (notes.trim() !== '') {
+                message += `📝 ملاحظات: ${notes}\n`;
+            }
+            
+            message += `\n📦 *تفاصيل الطلب:*\n`;
+            cart.forEach(item => {
+                message += `- ${item.name} | ${item.quantity} ${item.unit}\n`;
+            });
+
+            message += `\nلقد قمت بتجهيز فاتورة طلبي، وهي مرفقة كصورة. يرجى تأكيد الطلب. شكراً!`;
+
+            navigator.clipboard.writeText(message).then(() => {
+                alert('✅ تم نسخ تفاصيل طلبك بنجاح!\n\n📱 الآن افتح تطبيق الواتساب، اذهب لمحادثة "سنتر الذيب"، الصق النص هنا، وأرفق صورة الفاتورة (اللي حفظتها كـ PDF أو صورة).\n\nشكراً لتسوقك معنا!');
+            }).catch(err => {
+                prompt("انسخ النص التالي وأرسله للواتساب:", message);
+            });
+        }
+
+        renderInvoice();
+    </script>
+
+</body>
+</html>
