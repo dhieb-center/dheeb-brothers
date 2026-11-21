@@ -6,8 +6,8 @@
     <title>الفاتورة - سنتر الذيب</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     
+    <!-- مكتبة تحويل التصميم إلى صورة -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
         body { background-color: #f0f2f5; font-family: 'Cairo', sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
@@ -54,15 +54,20 @@
         .signature { text-align: center; font-size: 14px; color: #555; }
         .signature-line { width: 150px; border-bottom: 1px solid #4a1118; margin-top: 30px; }
 
-        /* الأزرار (خلينا زر واحد بس) */
         .actions { display: flex; gap: 10px; margin-top: 30px; flex-wrap: wrap; width: 100%; max-width: 700px; flex-direction: column; }
         .btn { padding: 18px; border-radius: 8px; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 18px; cursor: pointer; text-align: center; text-decoration: none; transition: 0.3s; border: none; display: inline-flex; justify-content: center; align-items: center; gap: 8px; width: 100%; }
+        
         .btn-save-pdf { background-color: #4a1118; color: #c9a45c; box-shadow: 0 4px 10px rgba(74, 17, 24, 0.3); }
         .btn-save-pdf:active { transform: scale(0.98); }
         .btn-edit { background-color: transparent; border: 2px solid #4a1118; color: #4a1118; font-size: 15px; padding: 12px; }
         .btn svg { width: 22px; height: 22px; fill: currentColor; }
         
         .empty-msg { text-align: center; color: #777; padding: 40px 0; font-size: 18px; font-weight: 600;}
+        
+        /* نافذة الصورة المنبثقة */
+        .modal-image-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; padding: 20px; box-sizing: border-box; }
+        .modal-image-content { background: #fff; padding: 15px; border-radius: 10px; max-width: 100%; max-height: 70vh; overflow: auto; text-align: center; }
+        .modal-image-content img { width: 100%; max-width: 400px; height: auto; border: 1px solid #ccc; border-radius: 5px; }
         
         @media print {
             body { background-color: #fff; padding: 0; }
@@ -143,18 +148,35 @@
         </div>
     </div>
 
-    <!-- زر حفظ وإرسال -->
     <div class="actions">
-        <button onclick="saveAndSend()" class="btn btn-save-pdf" id="savePdfBtn">
+        <!-- الزر الرئيسي لتحويل الفاتورة إلى صورة -->
+        <button onclick="generateImage()" class="btn btn-save-pdf" id="saveImgBtn">
             <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-            حفظ الفاتورة وإرسال لوسام
+            تحويل الفاتورة إلى صورة وإرسالها
         </button>
         
         <a href="products.html" class="btn btn-edit">تعديل الطلب (العودة للمنتجات)</a>
     </div>
 
+    <!-- نافذة عرض الصورة بعد إنشائها -->
+    <div id="imageModal" class="modal-image-overlay">
+        <div class="modal-image-content" style="margin-bottom: 15px;">
+            <h3 style="color: #4a1118; margin: 0 0 10px 0; font-size: 16px;">صورة الفاتورة جاهزة!</h3>
+            <p style="font-size: 12px; color: #777; margin-bottom: 10px;">(اضغط ضغطة طويلة على الصورة لحفظها في الهاتف)</p>
+            <img id="generatedImage" src="" alt="الفاتورة">
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 400px;">
+            <a href="#" id="waSendBtn" target="_blank" class="btn" style="background-color: #25D366; color: white; padding: 15px; font-size: 16px;">
+                إرسال الصورة لوسام على الواتساب
+            </a>
+            <button onclick="document.getElementById('imageModal').style.display='none'" class="btn" style="background-color: #fff; color: #333; padding: 12px; font-size: 14px;">
+                إغلاق
+            </button>
+        </div>
+    </div>
+
     <script>
-        // ✅ رقم وسام
         const ownerPhone = "963985164493"; 
 
         const customerName = localStorage.getItem('customerName') || 'زبون غير مسجل';
@@ -213,9 +235,10 @@
             }
         }
 
-        window.saveAndSend = function() {
+        // ✅ الدالة الجديدة: تحويل الفاتورة لصورة وعرضها للزبون
+        window.generateImage = function() {
             if (cart.length === 0) {
-                alert("السلة فاضية، لا يمكن حفظ فاتورة.");
+                alert("السلة فاضية، لا يمكن إنشاء فاتورة.");
                 return;
             }
 
@@ -228,8 +251,8 @@
                 return; 
             }
             
-            const btn = document.getElementById('savePdfBtn');
-            btn.innerHTML = "جاري تجهيز الفاتورة...";
+            const btn = document.getElementById('saveImgBtn');
+            btn.innerHTML = "جاري تجهيز الصورة...";
 
             const invoiceBox = document.getElementById('invoiceBox');
             const deleteButtons = document.querySelectorAll('#invoiceBody button');
@@ -242,6 +265,7 @@
             const addressInput = document.getElementById('deliveryAddress').value;
             const notesInput = document.getElementById('orderNotes').value;
             
+            // نضع النصوص الثابتة بدل المربعات قبل التصوير
             let summaryHTML = `<div class="info-box" style="flex: 100%;">
                 <h4>تفاصيل الاستلام:</h4>
                 <p><strong>الطريقة:</strong> ${isDelivery ? 'توصيل (دليفري)' : 'استلام من المركز'}</p>
@@ -251,21 +275,10 @@
             
             extraInfo.innerHTML = summaryHTML;
 
-            // تحويل الفاتورة لصورة ثم PDF
+            // تحويل التصميم إلى صورة
             html2canvas(invoiceBox, { scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false }).then(canvas => {
-                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                const imgData = canvas.toDataURL('image/jpeg', 0.9);
                 
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                
-                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-                
-                const fileName = `فاتورة_${customerName}_${invNum}.pdf`;
-                pdf.save(fileName);
-
                 // إرجاع التصميم لطبيعته
                 extraInfo.innerHTML = originalHTML;
                 window.toggleAddress = function() {
@@ -278,29 +291,22 @@
                     radio.addEventListener('change', window.toggleAddress);
                 });
                 if (isDelivery) document.getElementById('deliveryAddress').style.display = 'block';
-
                 deleteButtons.forEach(b => b.style.visibility = 'visible');
-                btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> حفظ الفاتورة وإرسال لوسام`;
+                
+                // إظهار النافذة والصورة
+                document.getElementById('generatedImage').src = imgData;
+                document.getElementById('imageModal').style.display = 'flex';
+                btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> تحويل الفاتورة إلى صورة وإرسالها`;
 
-                // ✅ إظهار نافذة الواتساب لرقم وسام
-                const waLink = `https://wa.me/${ownerPhone}?text=${encodeURIComponent('مرحباً وسام، أنا الزبون: ' + customerName + '\nلقد قمت بحفظ فاتورة طلبي كملف PDF، وسأقوم بإرفاقها الآن.')}`;
-                
-                const popup = document.createElement('div');
-                popup.style.cssText = `position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 9999; text-align: center; font-family: 'Cairo', sans-serif; max-width: 350px; border: 2px solid #4a1118; width: 90%;`;
-                
-                popup.innerHTML = `
-                    <h3 style="color: #4a1118; margin-top: 0;">✅ تم حفظ الفاتورة بنجاح!</h3>
-                    <p style="color: #555; font-size: 14px; line-height: 1.5;">تم تنزيل ملف الـ PDF في جهازك. <br>اضغط على الزر الأخضر بالأسفل لفتح واتساب وإرساله إلى <b>وسام</b>.</p>
-                    <a href="${waLink}" target="_blank" style="display: flex; justify-content: center; align-items: center; gap: 8px; background-color: #25D366; color: white; padding: 15px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px; margin-top: 20px;">إرسال إلى وسام على الواتساب <svg style="width: 24px; height: 24px; fill: white;" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
-                    <button onclick="this.parentElement.remove()" style="background: none; border: none; color: #999; margin-top: 15px; cursor: pointer; font-family: 'Cairo', sans-serif; font-size: 14px;">إغلاق النافذة</button>
-                `;
-                document.body.appendChild(popup);
+                // رابط الواتساب
+                const waLink = `https://wa.me/${ownerPhone}?text=${encodeURIComponent('مرحباً وسام، أنا الزبون: ' + customerName + '\nلقد قمت بتجهيز فاتورة طلبي، وهي مرفقة كصورة. يرجى تأكيد الطلب.')}`;
+                document.getElementById('waSendBtn').href = waLink;
 
             }).catch(err => {
-                alert("حدث خطأ أثناء إنشاء الملف: " + err);
+                alert("حدث خطأ أثناء إنشاء الصورة: " + err);
                 document.getElementById('extraInfoSection').innerHTML = originalHTML;
                 deleteButtons.forEach(b => b.style.visibility = 'visible');
-                btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> حفظ الفاتورة وإرسال لوسام`;
+                btn.innerHTML = "تحويل الفاتورة إلى صورة وإرسالها";
             });
         }
 
