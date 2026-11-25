@@ -10,60 +10,72 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
-        body { background-color: #f0f2f5; font-family: 'Cairo', sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        /* ✅ الألوان (نمط القرطاسية - بيج فاتح وغامق) */
+        :root {
+            --bg-page: #f2ece4;       
+            --bg-invoice: #fdfcf9;    
+            --beige-dark: #6d5843;    
+            --beige-medium: #c8b69b;  
+            --beige-light: #ece4d9;   
+            --text-dark: #3e2e22;     
+            --text-muted: #7a6e63;    
+        }
+
+        body { background-color: var(--bg-page); font-family: 'Cairo', sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         
         .invoice-box { 
-            background-color: #fff; width: 100%; max-width: 700px; padding: 40px; 
-            border-radius: 4px; box-shadow: 0 5px 25px rgba(0,0,0,0.08); 
-            position: relative; border: 1px solid #ddd;
+            background-color: var(--bg-invoice); width: 100%; max-width: 700px; padding: 40px; 
+            border-radius: 4px; box-shadow: 0 8px 30px rgba(109, 88, 67, 0.15); 
+            position: relative; border: 1px solid var(--beige-medium);
         }
         
-        .invoice-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #4a1118; padding-bottom: 20px; margin-bottom: 30px; }
+        .invoice-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed var(--beige-medium); padding-bottom: 20px; margin-bottom: 30px; }
         .invoice-logo img { width: 110px; height: auto; }
-        .invoice-info h1 { color: #4a1118; font-size: 28px; margin: 0 0 5px 0; font-weight: 900; }
-        .invoice-info p { margin: 3px 0; font-size: 14px; color: #555; font-weight: 600; }
-        .invoice-title { font-size: 22px; color: #c9a45c; font-weight: 700; margin-top: 10px; }
+        .invoice-info h1 { color: var(--beige-dark); font-size: 28px; margin: 0 0 5px 0; font-weight: 900; }
+        .invoice-info p { margin: 3px 0; font-size: 14px; color: var(--text-muted); font-weight: 600; }
+        .invoice-title { font-size: 22px; color: var(--beige-dark); font-weight: 700; margin-top: 10px; letter-spacing: 1px; }
 
-        .invoice-details-grid { display: flex; justify-content: space-between; margin-bottom: 30px; background-color: #fafafa; padding: 15px 20px; border-radius: 4px; border-right: 4px solid #c9a45c; }
-        .detail-col p { margin: 5px 0; font-size: 15px; color: #333; }
-        .detail-col strong { color: #4a1118; font-weight: 700; }
+        .invoice-details-grid { display: flex; justify-content: space-between; margin-bottom: 30px; background-color: var(--beige-light); padding: 15px 20px; border-radius: 4px; border-right: 5px solid var(--beige-dark); }
+        .detail-col p { margin: 5px 0; font-size: 15px; color: var(--text-dark); }
+        .detail-col strong { color: var(--beige-dark); font-weight: 700; }
 
         table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-        th { background-color: #4a1118; color: #fff; padding: 12px; font-size: 15px; font-weight: 700; text-align: right; }
-        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 15px; color: #333; font-weight: 600; }
-        tr:nth-child(even) { background-color: #fcfcfc; }
-        .item-name { font-weight: 700; color: #4a1118; }
-        .item-qty { font-weight: 700; color: #c9a45c; text-align: center; }
+        th { background-color: var(--beige-dark); color: var(--bg-invoice); padding: 12px; font-size: 15px; font-weight: 700; text-align: right; }
+        td { padding: 12px; border-bottom: 1px solid var(--beige-medium); font-size: 15px; color: var(--text-dark); font-weight: 600; }
+        tr:nth-child(even) { background-color: var(--bg-page); }
+        .item-name { font-weight: 700; color: var(--beige-dark); }
+        .item-qty { font-weight: 700; color: var(--beige-dark); text-align: center; }
 
         .extra-info { display: flex; justify-content: space-between; margin-bottom: 30px; gap: 20px; flex-wrap: wrap; }
-        .info-box { flex: 1; min-width: 200px; border: 1px solid #e0e0e0; border-radius: 4px; padding: 15px; background: #fff; }
-        .info-box h4 { color: #4a1118; margin: 0 0 10px 0; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .info-box p { margin: 5px 0; font-size: 14px; color: #333; }
-        .notes-input, .address-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: 'Cairo', sans-serif; box-sizing: border-box; font-size: 14px; }
+        .info-box { flex: 1; min-width: 200px; border: 1px solid var(--beige-medium); border-radius: 4px; padding: 15px; background: #fff; }
+        .info-box h4 { color: var(--beige-dark); margin: 0 0 10px 0; font-size: 16px; border-bottom: 1px solid var(--beige-light); padding-bottom: 5px; }
+        .info-box p { margin: 5px 0; font-size: 14px; color: var(--text-dark); }
+        .notes-input, .address-input { width: 100%; padding: 10px; border: 1px solid var(--beige-medium); border-radius: 4px; font-family: 'Cairo', sans-serif; box-sizing: border-box; font-size: 14px; background-color: var(--bg-invoice); }
         .radio-group { display: flex; gap: 15px; margin-bottom: 10px; }
-        .radio-label { display: flex; align-items: center; gap: 5px; font-weight: 600; color: #333; font-size: 14px; cursor: pointer;}
+        .radio-label { display: flex; align-items: center; gap: 5px; font-weight: 600; color: var(--text-dark); font-size: 14px; cursor: pointer;}
+        .radio-label input { accent-color: var(--beige-dark); }
 
-        .invoice-footer { display: flex; justify-content: space-between; align-items: flex-end; border-top: 2px dashed #c9a45c; padding-top: 20px; margin-top: 20px; }
-        .footer-text p { font-size: 14px; color: #777; margin: 5px 0; font-weight: 600; }
-        .footer-text .thanks { font-size: 18px; color: #4a1118; font-weight: 900; }
-        .signature { text-align: center; font-size: 14px; color: #555; }
-        .signature-line { width: 150px; border-bottom: 1px solid #4a1118; margin-top: 30px; }
+        .invoice-footer { display: flex; justify-content: space-between; align-items: flex-end; border-top: 2px dashed var(--beige-medium); padding-top: 20px; margin-top: 20px; }
+        .footer-text p { font-size: 14px; color: var(--text-muted); margin: 5px 0; font-weight: 600; }
+        .footer-text .thanks { font-size: 18px; color: var(--beige-dark); font-weight: 900; }
+        .signature { text-align: center; font-size: 14px; color: var(--text-dark); }
+        .signature-line { width: 150px; border-bottom: 1px solid var(--beige-dark); margin-top: 30px; }
 
         .actions { display: flex; gap: 10px; margin-top: 30px; flex-wrap: wrap; width: 100%; max-width: 700px; flex-direction: column; }
         .btn { padding: 16px; border-radius: 8px; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 16px; cursor: pointer; text-align: center; text-decoration: none; transition: 0.3s; border: none; display: inline-flex; justify-content: center; align-items: center; gap: 8px; width: 100%; }
         
-        /* زر الواتساب */
         .btn-whatsapp { background-color: #25D366; color: white; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); font-size: 18px; }
-        .btn-whatsapp:active { transform: scale(0.98); }
+        .btn-edit { background-color: transparent; border: 2px solid var(--beige-dark); color: var(--beige-dark); font-size: 15px; padding: 12px; }
+        .btn-edit:hover { background-color: var(--beige-dark); color: #fff; }
+        
+        .empty-msg { text-align: center; color: var(--text-muted); padding: 40px 0; font-size: 18px; font-weight: 600;}
 
-        .btn-edit { background-color: transparent; border: 2px solid #4a1118; color: #4a1118; font-size: 15px; padding: 12px; }
+        .login-alert { background-color: #fff3cd; color: #856404; padding: 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ffeeba; text-align: center; font-weight: bold; line-height: 1.6; }
+        .btn-login-now { background-color: var(--beige-dark); color: #fff; text-decoration: none; padding: 15px; border-radius: 8px; font-weight: bold; text-align: center; display: block; }
         
-        .empty-msg { text-align: center; color: #777; padding: 40px 0; font-size: 18px; font-weight: 600;}
-        
-        /* نافذة عرض الصورة */
-        .modal-image-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; padding: 20px; box-sizing: border-box; }
+        .modal-image-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(62, 46, 34, 0.85); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; padding: 20px; box-sizing: border-box; }
         .modal-image-content { background: #fff; padding: 15px; border-radius: 10px; max-width: 100%; max-height: 80vh; overflow: auto; text-align: center; }
-        .modal-image-content img { width: 100%; max-width: 400px; height: auto; border: 1px solid #ccc; border-radius: 5px; }
+        .modal-image-content img { width: 100%; max-width: 400px; height: auto; border: 1px solid var(--beige-medium); border-radius: 5px; }
         
         @media print {
             body { background-color: #fff; padding: 0; }
@@ -142,14 +154,12 @@
         </div>
     </div>
 
-    <div class="actions">
-        <!-- ✅ الزر 1: إرسال كأسطر نصية للواتساب -->
+    <div class="actions" id="actionButtonsContainer">
         <button onclick="sendTextToWhatsApp()" class="btn btn-whatsapp">
             <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
             إرسال الطلب لوسام على الواتساب
         </button>
 
-        <!-- ✅ الزر 2: عرض الفاتورة كصورة (لحفظها) -->
         <button onclick="generateImage()" class="btn btn-edit" style="border-color: #25D366; color: #25D366;">
             📸 عرض وحفظ صورة الفاتورة
         </button>
@@ -157,10 +167,9 @@
         <a href="products.html" class="btn btn-edit">تعديل الطلب</a>
     </div>
 
-    <!-- نافذة عرض الصورة -->
     <div id="imageModal" class="modal-image-overlay">
         <div class="modal-image-content">
-            <h3 style="color: #4a1118; margin: 0 0 10px 0; font-size: 16px;">صورة الفاتورة</h3>
+            <h3 style="color: var(--beige-dark); margin: 0 0 10px 0; font-size: 16px;">صورة الفاتورة</h3>
             <p style="font-size: 12px; color: #d9534f; margin-bottom: 10px; font-weight: bold;">(اضغط مطولاً على الصورة واختر "حفظ الصورة")</p>
             <img id="generatedImage" src="" alt="الفاتورة">
         </div>
@@ -169,9 +178,24 @@
         </button>
     </div>
 
-    <script>
-        const ownerPhone = "963985164493"; 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlT3aXjE7Bg6a2gx4YSGH61ybW0sdQS2g",
+            authDomain: "dheeb-brothers.firebaseapp.com",
+            projectId: "dheeb-brothers",
+            storageBucket: "dheeb-brothers.firebasestorage.app",
+            messagingSenderId: "419429945832",
+            appId: "1:419429945832:web:6cf5bc22ec496db576945d",
+            measurementId: "G-GBRL9YKWKE"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const ownerPhone = "963985164493"; 
         const customerName = localStorage.getItem('customerName') || 'زبون غير مسجل';
         const customerPhone = localStorage.getItem('customerPhone') || 'غير متوفر';
         
@@ -180,12 +204,26 @@
 
         const today = new Date();
         document.getElementById('invoiceDate').innerText = today.toLocaleDateString('ar-EG-u-nu-latn');
-        
         const invNum = 'INV-' + Math.floor(Math.random() * 1000000);
         document.getElementById('invoiceNumber').innerText = invNum;
 
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         const invoiceBody = document.getElementById('invoiceBody');
+        const actionButtons = document.getElementById('actionButtonsContainer');
+
+        // 🔒 التحقق من الحماية (إخفاء الأزرار)
+        onAuthStateChanged(auth, (user) => {
+            const savedPhone = localStorage.getItem('customerPhone');
+            if (!user && !savedPhone) {
+                actionButtons.innerHTML = `
+                    <div class="login-alert">
+                        ⚠️ عذراً، يجب عليك تسجيل الدخول كزبون أولاً لتتمكن من إرسال الطلب أو حفظ الفاتورة.
+                    </div>
+                    <a href="customer-login.html" class="btn-login-now">🔒 تسجيل الدخول الآن</a>
+                    <a href="products.html" class="btn btn-edit" style="margin-top: 10px;">العودة للمنتجات</a>
+                `;
+            }
+        });
 
         window.toggleAddress = function() {
             const deliveryRadio = document.querySelector('input[name="delivery"]:checked').value;
@@ -200,12 +238,10 @@
 
         function renderInvoice() {
             invoiceBody.innerHTML = '';
-            
             if (cart.length === 0) {
-                invoiceBody.innerHTML = '<tr><td colspan="4" class="empty-msg">السلة فاضية! اذهب لتصفح المنتجات وإضافة منتجات.</td></tr>';
+                invoiceBody.innerHTML = '<tr><td colspan="4" class="empty-msg">السلة فاضية!</td></tr>';
                 return;
             }
-
             cart.forEach((item, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -228,8 +264,14 @@
             }
         }
 
-        // ✅ 1. دالة إرسال النص للواتساب
+        // 🔒 دالة إرسال النص (مع حماية إضافية)
         window.sendTextToWhatsApp = function() {
+            if (!auth.currentUser && !localStorage.getItem('customerPhone')) {
+                alert("⚠️ عذراً، يجب عليك تسجيل الدخول أولاً.");
+                window.location.href = 'customer-login.html';
+                return;
+            }
+
             if (cart.length === 0) {
                 alert("السلة فاضية، لا يمكن إرسال الطلب.");
                 return;
@@ -258,13 +300,18 @@
             });
 
             message += `\nشكراً!`;
-
             const waLink = `https://wa.me/${ownerPhone}?text=${encodeURIComponent(message)}`;
             window.open(waLink, '_blank');
         }
 
-        // ✅ 2. دالة عرض الصورة (عشان يقدر يحفظها)
+        // 🔒 دالة الصورة (مع حماية إضافية)
         window.generateImage = function() {
+            if (!auth.currentUser && !localStorage.getItem('customerPhone')) {
+                alert("⚠️ عذراً، يجب عليك تسجيل الدخول أولاً.");
+                window.location.href = 'customer-login.html';
+                return;
+            }
+
             if (cart.length === 0) {
                 alert("السلة فاضية، لا يمكن إنشاء صورة.");
                 return;
@@ -333,6 +380,5 @@
 
         renderInvoice();
     </script>
-
 </body>
 </html>
